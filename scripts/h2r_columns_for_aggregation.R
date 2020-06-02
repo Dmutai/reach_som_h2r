@@ -164,6 +164,9 @@ equal <- c("base",
            "still_contact_htr" )
 
 
+equal_yes_no <- c(yes_no_colmns, equal)
+
+
 settlement_yes <- df %>%
   select(essential_col, yes_no_colmns) %>%
   group_by_(.dots = c( "calc.region","calc.district","finalsettlment")) %>%
@@ -172,6 +175,11 @@ settlement_yes <- df %>%
 
 settlement_equal <- df %>%
   select(essential_col, equal) %>%
+  group_by_(.dots = c( "calc.region","calc.district","finalsettlment")) %>%
+  summarise_all(funs(AoK))
+
+settlement_equal_yes <- df %>%
+  select(essential_col, equal_yes_no) %>%
   group_by_(.dots = c( "calc.region","calc.district","finalsettlment")) %>%
   summarise_all(funs(AoK))
 

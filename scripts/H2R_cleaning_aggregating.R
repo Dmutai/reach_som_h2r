@@ -1,4 +1,5 @@
 library(tidyverse)
+install.packages("koboloadeR")
 library(butteR)
 library(koboloadeR)
 library(survey)
@@ -61,13 +62,20 @@ som_settlements <-st_transform(som_settlements,crs=4326)
 #Data formattting for aggregation====
 
 
-#Remove columns with only blanks
+# Remove columns with only blanks
 
 df <- Filter(function(x)!all(is.na(x) ), df)
 
 
 #Create a new column that combines what was mapped as other and has nearest settlement given, keep only dataset with both columns and records have values
 df <- df %>% filter(!info_settlement=="") %>%  mutate(finalsettlment= ifelse(info_settlement=="other",info_set_oth_near,info_settlement))
+
+#converting all the "dontknow" columns values to "NAs" 
+
+
+dontknowcols <- grepl(".dontknow", names(df))
+df[dontknowcols] <- NA
+
 
 
 
@@ -94,7 +102,7 @@ ki_coverage <- df %>%
 
 
 #table join. Let us merge all these columns/fields into one database
-analysis_df_list<-list(settlement_yes, settlement_equal,settlement_mscols)
+analysis_df_list<-list(settlement_yes, settlement_equal_yes,settlement_mscols)
 # settlement_joined<-purrr::reduce(analysis_df_list, left_join(by= c("D.info_state","D.info_county", "D.info_settlement")))
 settlement_data <-purrr::reduce(analysis_df_list, left_join)
 
@@ -281,3 +289,4 @@ write.csv(grid_level,"outputs/Aggregation by hex 400km.csv" )
 write.csv(district_level,"outputs/Aggregation by district.csv" )
 write.csv(district_level,"outputs/Aggregation by district.csv" )
 write.csv(setlement_level,"outputs/settlement_aggregation.csv" )
+
