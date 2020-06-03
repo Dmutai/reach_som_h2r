@@ -1,5 +1,4 @@
 library(tidyverse)
-install.packages("koboloadeR")
 library(butteR)
 library(koboloadeR)
 library(survey)
@@ -7,6 +6,9 @@ library(lubridate)
 library(sf)
 library(openxlsx)
 library(srvyr)
+library(naniar)
+
+
 
 #Call in the data we will use
 
@@ -62,7 +64,7 @@ som_settlements <-st_transform(som_settlements,crs=4326)
 #Data formattting for aggregation====
 
 
-# Remove columns with only blanks
+#Remove columns with only blanks
 
 df <- Filter(function(x)!all(is.na(x) ), df)
 
@@ -70,14 +72,14 @@ df <- Filter(function(x)!all(is.na(x) ), df)
 #Create a new column that combines what was mapped as other and has nearest settlement given, keep only dataset with both columns and records have values
 df <- df %>% filter(!info_settlement=="") %>%  mutate(finalsettlment= ifelse(info_settlement=="other",info_set_oth_near,info_settlement))
 
+
 #converting all the "dontknow" columns values to "NAs" 
 
 
 dontknowcols <- grepl(".dontknow", names(df))
 df[dontknowcols] <- NA
 
-
-
+prop_miss(df)
 
 #Join with the settlement data as some districts are blank if chosen near settlement
 
@@ -102,7 +104,7 @@ ki_coverage <- df %>%
 
 
 #table join. Let us merge all these columns/fields into one database
-analysis_df_list<-list(settlement_yes, settlement_equal_yes,settlement_mscols)
+analysis_df_list<-list(settlement_equal_yes,settlement_mscols)
 # settlement_joined<-purrr::reduce(analysis_df_list, left_join(by= c("D.info_state","D.info_county", "D.info_settlement")))
 settlement_data <-purrr::reduce(analysis_df_list, left_join)
 
@@ -177,15 +179,14 @@ dfsvy_h2r_district <-srvyr::as_survey(setlement_level)
 
 h2r_columns <- setlement_level %>% select(when_left_prev:still_contact_htr, - contains(c("other","dontknow","noresponse"))) %>%  colnames() %>% dput()
 
-
 #Region level aggregation-----------
 
 region_h2r <-butteR::mean_proportion_table(design = dfsvy_h2r_district,
-                      list_of_variables = h2r_columns,
-                      aggregation_level = "ADM1_NAME",
-                      round_to = 2,
-                     return_confidence = FALSE,
-                     na_replace = FALSE)
+                                           list_of_variables = h2r_columns,
+                                           aggregation_level = "ADM1_NAME",
+                                           round_to = 2,
+                                           return_confidence = FALSE,
+                                           na_replace = FALSE)
 
 
 
@@ -229,6 +230,8 @@ district_level <-purrr::reduce(analysis_df_list, left_join)
 
 #Grid level aggregation---------
 
+
+args(butteR::mean_proportion_table)
 hex_400_h2r <-butteR::mean_proportion_table(design = dfsvy_h2r_district,
                                             list_of_variables = h2r_columns,
                                             aggregation_level = "hex_4000km",
@@ -264,6 +267,7 @@ names(grid_400km)[names(grid_400km) == "sett_num"] <- "sett_num"
 setlement_level <- setlement_level %>% select(everything(), - contains(c("other","dontknow","noresponse")))
 names(setlement_level) <- gsub("\\.", "_", names(setlement_level))
 
+view(setlement_level)
 
 #grid_level
 grid_level <- grid_400km %>% select(everything(), - contains(c("other","dontknow","noresponse")))
