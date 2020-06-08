@@ -79,7 +79,9 @@ df <- df %>% filter(!info_settlement=="") %>%  mutate(finalsettlment= ifelse(inf
 dontknowcols <- grepl(".dontknow", names(df))
 df[dontknowcols] <- NA
 
-prop_miss(df)
+df[ df == "dontknow" ] <- NA
+
+
 
 #Join with the settlement data as some districts are blank if chosen near settlement
 
