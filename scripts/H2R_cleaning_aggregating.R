@@ -6,9 +6,6 @@ library(lubridate)
 library(sf)
 library(openxlsx)
 library(srvyr)
-library(naniar)
-
-
 
 #Call in the data we will use
 
@@ -24,8 +21,8 @@ admin_gdb<- "inputs/gis_data/boundaries"
 
 #Clean data
 df<-read.csv("inputs/2020_01/h2r_jan_consolidated_mog_baidoa_clean.csv", stringsAsFactors = FALSE)
-
 #latest settlement data used
+
 itemset<-read.csv("inputs/2020_01/itemsets.csv", stringsAsFactors = FALSE)
 colnames(itemset)<-paste0("calc.",colnames(itemset))
 
@@ -73,15 +70,6 @@ df <- Filter(function(x)!all(is.na(x) ), df)
 df <- df %>% filter(!info_settlement=="") %>%  mutate(finalsettlment= ifelse(info_settlement=="other",info_set_oth_near,info_settlement))
 
 
-#converting all the "dontknow" columns values to "NAs" 
-
-
-dontknowcols <- grepl(".dontknow", names(df))
-df[dontknowcols] <- NA
-
-df[ df == "dontknow" ] <- NA
-
-
 
 #Join with the settlement data as some districts are blank if chosen near settlement
 
@@ -106,7 +94,7 @@ ki_coverage <- df %>%
 
 
 #table join. Let us merge all these columns/fields into one database
-analysis_df_list<-list(settlement_equal_yes,settlement_mscols)
+analysis_df_list<-list(settlement_yes, settlement_equal,settlement_mscols)
 # settlement_joined<-purrr::reduce(analysis_df_list, left_join(by= c("D.info_state","D.info_county", "D.info_settlement")))
 settlement_data <-purrr::reduce(analysis_df_list, left_join)
 
@@ -132,6 +120,225 @@ if(length(check_these>0)){
   check_these %>% dput()
 }
 
+#Now we want to clean the data for some skiplogic (SL) errors introduced after settlement level aggregation.
+
+# KI info
+# left_behind_y_n
+
+
+settlement_data$left_behind_who.men_18_59[settlement_data$left_behind_y_n != "yes"] <- "SL"
+settlement_data$left_behind_who.b_0_11[settlement_data$left_behind_y_n != "yes"] <- "SL"
+settlement_data$left_behind_who.women_60_eld[settlement_data$left_behind_y_n != "yes"] <- "SL"
+settlement_data$left_behind_who.boys_12_17[settlement_data$left_behind_y_n != "yes"] <- "SL"
+settlement_data$left_behind_who.men_60_eld[settlement_data$left_behind_y_n != "yes"] <- "SL"
+settlement_data$left_behind_who.women_18_59[settlement_data$left_behind_y_n != "yes"] <- "SL"
+settlement_data$left_behind_who.g_0_11[settlement_data$left_behind_y_n != "yes"] <- "SL"
+settlement_data$left_behind_who.girls_12_17[settlement_data$left_behind_y_n != "yes"] <- "SL"
+
+#pwd_left_behind
+settlement_data$pwd_left_behind[settlement_data$left_behind_y_n != "yes"] <- "SL"
+
+#secondary_reason_moved
+
+settlement_data$secondary_reason_moved[settlement_data$primary_reason_moved == "noresponse" |settlement_data$idp_proportion_settlem == "dontknow" ] <- "SL"
+
+
+
+#Settlement Profile
+#idp_proportion
+
+settlement_data$idp_new_arrivals[settlement_data$idp_proportion_settlem == "no_idps" |settlement_data$idp_proportion_settlem == "dontknow" ] <- "SL"
+
+#idp_new_arrivals
+
+
+settlement_data$idp_arrived_from[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_from_reg[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_from_district[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.lack_jobs[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.no_services[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.lack_jobs[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.evictions[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.noresponse[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.dontknow[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.drought[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.flooding[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.other[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_arrived_reason.conflict[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+
+
+
+settlement_data$idp_pull_factors.better_security[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_pull_factors.noresponse[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_pull_factors.better_services[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_pull_factors.presence_jobs[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_pull_factors.availability_shelters[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_pull_factors.access_water[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_pull_factors.other[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_pull_factors.dontknow[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+settlement_data$idp_pull_factors.access_food[settlement_data$idp_new_arrivals != "yes"] <- "SL"
+
+
+
+# Food Security and Nutrition
+#all answers with SL based on access_market
+#nomarket
+
+settlement_data$nomarket_why.bad_quality[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.dontknow[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.market_far[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.other[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.no_items[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.security[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.no_cash[settlement_data$access_market != "no_access"] <- "SL"
+
+
+settlement_data$market_region[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+
+settlement_data$market_district[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+
+settlement_data$market_settlement[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+
+settlement_data$distance_to_market[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+
+
+settlement_data$market_goods.clothes_sewing[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.tools_seeds[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.livestock[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.food[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.jerry_cans[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.construction_materials[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.mosquito_nets[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.womens_materials[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.fuel_cooking[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.dontknow[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.soap[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+settlement_data$market_goods.shoes[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" ] <- "SL"
+
+
+#lackfoods
+settlement_data$lack_food_reasons.noland[settlement_data$skip_meals != "yes"] <- "SL"
+settlement_data$lack_food_reasons.nomarket[settlement_data$skip_meals != "yes"] <- "SL"
+settlement_data$lack_food_reasons.natural_causes[settlement_data$skip_meals != "yes"] <- "SL"
+settlement_data$lack_food_reasons.other[settlement_data$skip_meals != "yes"] <- "SL"
+settlement_data$lack_food_reasons.economic_causes[settlement_data$skip_meals != "yes"] <- "SL"
+settlement_data$lack_food_reasons.dontknow[settlement_data$skip_meals != "yes"] <- "SL"
+settlement_data$lack_food_reasons.security[settlement_data$skip_meals != "yes"] <- "SL"
+settlement_data$lack_food_reasons_other[settlement_data$skip_meals != "yes"] <- "SL"
+
+
+#Health
+# access_health_services
+
+settlement_data$available_health_services.clinic[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.none[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.mobile_clinic[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.hospital[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.first_aid[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.other[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.midwife[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.dontknow[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.healer[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.individual_pract[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.drugstore[settlement_data$access_healthservices != "yes"] <- "SL"
+
+#dist_clinic
+
+settlement_data$distance_clinic[settlement_data$available_health_services.clinic != "yes" & settlement_data$available_health_services.mobile_clinic != "yes"] <- "SL"
+
+#no_access_health
+
+settlement_data$noaccess_health.none[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$noaccess_health.m_over60[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$noaccess_health.m_over18[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$noaccess_health.g_under18[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$noaccess_health.pwd[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$noaccess_health.other[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$noaccess_health.dontknow[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$noaccess_health.b_under18[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$noaccess_health.w_over60[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$noaccess_health.w_over18[settlement_data$access_healthservices != "yes"] <- "SL"
+
+settlement_data$region_clinic[settlement_data$available_health_services != "clinic" & settlement_data$available_health_services != "mobile_clinic"] <- "SL"
+settlement_data$district_clinic_001[settlement_data$available_health_services != "clinic" & settlement_data$available_health_services != "mobile_clinic"] <- "SL"
+
+
+
+
+# Protection related
+settlement_data$idp_host_relationships[settlement_data$idp_proportion_settlem == "no_idps" | settlement_data$idp_proportion_settlem == "dontknow"] <- "SL"
+
+settlement_data$land_tenure_form[settlement_data$ppl_no_land_tenure == "dontknow" | settlement_data$idp_proportion_settlem == "no"] <- "SL"
+
+
+## protection_inc_location
+
+
+
+settlement_data$protection_inc_location.human_aid_distr[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.school[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.shelters[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.bathing_pl[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.checkpoint[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.dontknow[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.clinic[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.on_the_road[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.latrines[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.near_water[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.in_field[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.other[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$protection_inc_location.market[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+
+
+
+
+
+##Conflict mediators
+
+settlement_data$conflict_mediators.clan_lead[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.gatekeeper[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.none[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.loc_authorities[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.loc_authorities[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.rel_leader[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.health_staff[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.ngo_staff[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.other[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.commun_leader_elder[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.dontknow[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+settlement_data$conflict_mediators.noresponse[settlement_data$protection_incidents == "dontknow" | settlement_data$protection_incidents == "none" | settlement_data$protection_incidents == "noresponse"] <- "SL"
+
+
+
+
+# Shelter and NFI
+
+settlement_data$shelters_not_rebuilt[settlement_data$dam_shelters_reason == "no_destroyed" | settlement_data$dam_shelters_reason == "dontknow" ] <- "SL"
+settlement_data$shelt_not_rebuilt_why[settlement_data$dam_shelters_reason == "no_destroyed" | settlement_data$dam_shelters_reason == "dontknow" ] <- "SL"
+
+settlement_data$surfacewater_drinking[settlement_data$mainsource_water == "berkad" | settlement_data$mainsource_water == "river_pond"] <- "SL"
+
+
+
+# education
+
+settlement_data$time_to_school[settlement_data$education_available.none == "yes" | settlement_data$education_available.dontknow == "yes"] <- "SL"
+
+# ngo support
+
+settlement_data$ngo_support_type.none[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.livestock[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.cash_distrib[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.seeds_tools[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.other[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.vaccinations[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.dontknow[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.food_distrib[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.education_service[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.construction_materials_nfis[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+settlement_data$ngo_support_type.legal_support[settlement_data$ngo_support_y_n != "yes"] <- "SL"
+
+
 
 
 settlement_data <- settlement_data %>%  select(base:consent,calc.region, calc.district,finalsettlment,D.ki_coverage,info_settlement:particip_again)
@@ -145,7 +352,7 @@ write.csv(
 
 #Spatial join----
 
-#Join our data to settlment shapefile
+#Join our data to settlement shapefile
 
 settlement_data$P_CODE <- settlement_data$finalsettlment
 settlement_data$month <- "20200101"
@@ -181,14 +388,15 @@ dfsvy_h2r_district <-srvyr::as_survey(setlement_level)
 
 h2r_columns <- setlement_level %>% select(when_left_prev:still_contact_htr, - contains(c("other","dontknow","noresponse"))) %>%  colnames() %>% dput()
 
+
 #Region level aggregation-----------
 
 region_h2r <-butteR::mean_proportion_table(design = dfsvy_h2r_district,
-                                           list_of_variables = h2r_columns,
-                                           aggregation_level = "ADM1_NAME",
-                                           round_to = 2,
-                                           return_confidence = FALSE,
-                                           na_replace = FALSE)
+                      list_of_variables = h2r_columns,
+                      aggregation_level = "ADM1_NAME",
+                      round_to = 2,
+                     return_confidence = FALSE,
+                     na_replace = FALSE)
 
 
 
@@ -232,8 +440,6 @@ district_level <-purrr::reduce(analysis_df_list, left_join)
 
 #Grid level aggregation---------
 
-
-args(butteR::mean_proportion_table)
 hex_400_h2r <-butteR::mean_proportion_table(design = dfsvy_h2r_district,
                                             list_of_variables = h2r_columns,
                                             aggregation_level = "hex_4000km",
@@ -269,7 +475,6 @@ names(grid_400km)[names(grid_400km) == "sett_num"] <- "sett_num"
 setlement_level <- setlement_level %>% select(everything(), - contains(c("other","dontknow","noresponse")))
 names(setlement_level) <- gsub("\\.", "_", names(setlement_level))
 
-view(setlement_level)
 
 #grid_level
 grid_level <- grid_400km %>% select(everything(), - contains(c("other","dontknow","noresponse")))
@@ -295,4 +500,3 @@ write.csv(grid_level,"outputs/Aggregation by hex 400km.csv" )
 write.csv(district_level,"outputs/Aggregation by district.csv" )
 write.csv(district_level,"outputs/Aggregation by district.csv" )
 write.csv(setlement_level,"outputs/settlement_aggregation.csv" )
-
