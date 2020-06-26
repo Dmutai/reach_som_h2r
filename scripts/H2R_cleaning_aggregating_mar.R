@@ -6,7 +6,7 @@ library(lubridate)
 library(sf)
 library(openxlsx)
 library(srvyr)
-# library(mergekobodata)
+library(mergekobodata)
 
 
 #Call in the data we will use
@@ -23,19 +23,19 @@ admin_gdb<- "inputs/gis_data/boundaries"
 
 #Additional scripts to use incase there are several files to be merged
 # merge Mogadishu and Baidoa clean data
-# merge_kobo_data("inputs/2020_02/",".csv", output_file = "inputs/2020_02/h2r_feb_consolidated_mog_baidoa_clean.csv")
+#merge_kobo_data("inputs/2020_03/",".csv", output_file = "inputs/2020_03/h2r_mar_consolidated_mog_baidoa_clean.csv")
 
 
 
 #Clean data
-df<-read.csv("inputs/2020_01/h2r_jan_consolidated_mog_baidoa_clean.csv", stringsAsFactors = FALSE)
+df<-read.csv("inputs/2020_03/h2r_mar_consolidated_mog_baidoa_clean.csv", stringsAsFactors = FALSE)
 #latest settlement data used
 
 itemset<-read.csv("inputs/2020_01/itemsets.csv", stringsAsFactors = FALSE)
 colnames(itemset)<-paste0("calc.",colnames(itemset))
 
 #Baidoa data collection tool
-a <- loadWorkbook ( "inputs/2020_01/SOM_H2R_Jan_1_Baidoa.xlsx")
+a <- loadWorkbook ( "inputs/2020_03/SOM_H2R_V2_March_Baidoa.xlsx")
 sheetNames <- sheets(a)
 for(i in 1:length(sheetNames))
 {
@@ -93,7 +93,7 @@ df <- left_join(df,item_geo, by = "finalsettlment")
 #Ki- settlement level aggregation----------
 #Columns select beased function applied
 
-source("scripts/h2r_columns_for_aggregation.R")
+source("scripts/h2r_mar_columns_for_aggregation.R")
 
 ki_coverage <- df %>%
   select(calc.region,calc.district,finalsettlment, particip_again) %>%
@@ -232,7 +232,7 @@ settlement_data$lack_food_reasons.other[settlement_data$skip_meals != "yes"] <- 
 settlement_data$lack_food_reasons.economic_causes[settlement_data$skip_meals != "yes"] <- "SL"
 settlement_data$lack_food_reasons.dontknow[settlement_data$skip_meals != "yes"] <- "SL"
 settlement_data$lack_food_reasons.security[settlement_data$skip_meals != "yes"] <- "SL"
-settlement_data$lack_food_reasons_other[settlement_data$skip_meals != "yes"] <- "SL"
+#settlement_data$lack_food_reasons_other[settlement_data$skip_meals != "yes"] <- "SL"
 
 
 #Health
@@ -267,8 +267,8 @@ settlement_data$noaccess_health.b_under18[settlement_data$access_healthservices 
 settlement_data$noaccess_health.w_over60[settlement_data$access_healthservices != "yes"] <- "SL"
 settlement_data$noaccess_health.w_over18[settlement_data$access_healthservices != "yes"] <- "SL"
 
-settlement_data$region_clinic[settlement_data$available_health_services != "clinic" & settlement_data$available_health_services != "mobile_clinic"] <- "SL"
-settlement_data$district_clinic_001[settlement_data$available_health_services != "clinic" & settlement_data$available_health_services != "mobile_clinic"] <- "SL"
+settlement_data$region_clinic[settlement_data$available_health_services.clinic != "yes" & settlement_data$available_health_services.mobile_clinic != "yes"] <- "SL"
+settlement_data$district_clinic[settlement_data$available_health_services.clinic != "yes" & settlement_data$available_health_services.mobile_clinic != "yes"] <- "SL"
 
 
 
@@ -353,7 +353,7 @@ settlement_data <- settlement_data %>%  select(base:consent,calc.region, calc.di
 
 write.csv(
   settlement_data,
-  file = "outputs/som_H2r__clean_data_20200101.csv",
+  file = "outputs/som_H2r__clean_data_20200301.csv",
   na = "",
   row.names = FALSE)
 
@@ -362,7 +362,7 @@ write.csv(
 #Join our data to settlement shapefile
 
 settlement_data$P_CODE <- settlement_data$finalsettlment
-settlement_data$month <- "20200101"
+settlement_data$month <- "20200301"
 som_settlements_data <- inner_join(som_settlements,settlement_data )
 
 
@@ -381,20 +381,32 @@ setlement_level <- som_settlements_data %>%  select(name:particip_again) %>% fil
 
 #Reformatting the datato run in srvyr package for the as_survey function
 
-setlement_level$still_inhabited <- forcats::fct_expand(setlement_level$still_inhabited,c("yes","no"))
-setlement_level$livelihood_activ.money_rent <- forcats::fct_expand(setlement_level$livelihood_activ.money_rent,c("yes","no"))
-setlement_level$livelihood_activ.none <- forcats::fct_expand(setlement_level$livelihood_activ.none,c("yes","no"))
-setlement_level$livelihood_activ.humanitar_assistance <- forcats::fct_expand(setlement_level$livelihood_activ.humanitar_assistance,c("yes","no"))
-setlement_level$education_available.ngoschool <- forcats::fct_expand(setlement_level$education_available.ngoschool,c("yes","no"))
-setlement_level$main_radios.radio_xamar <- forcats::fct_expand(setlement_level$main_radios.radio_xamar,c("yes","no"))
-setlement_level$main_radios.radio_xurmo <- forcats::fct_expand(setlement_level$main_radios.radio_xurmo,c("yes","no"))
-setlement_level$conflict_causes.tohumanitarianaid <- forcats::fct_expand(setlement_level$conflict_causes.tohumanitarianaid, c("yes", "no"))
-setlement_level$info_mainsource.sms <- forcats::fct_expand(setlement_level$info_mainsource.sms, c("yes", "no"))
-setlement_level$info_mainsource.social_media <- forcats::fct_expand(setlement_level$info_mainsource.social_media, c("yes", "no"))
-setlement_level$info_mainsource.internet <- forcats::fct_expand(setlement_level$info_mainsource.internet, c("yes", "no"))
-setlement_level$main_radios.radio_banadir <- forcats::fct_expand(setlement_level$main_radios.radio_banadir, c("yes", "no"))
-setlement_level$main_radios.al_risaala <- forcats::fct_expand(setlement_level$main_radios.al_risaala, c("yes", "no"))
-setlement_level$info_barriers.written_info_illiterate <- forcats::fct_expand(setlement_level$info_barriers.written_info_illiterate, c("yes", "no"))
+# setlement_level$still_inhabited <- forcats::fct_expand(setlement_level$still_inhabited,c("yes","no"))
+# setlement_level$livelihood_activ.money_rent <- forcats::fct_expand(setlement_level$livelihood_activ.money_rent,c("yes","no"))
+# setlement_level$livelihood_activ.none <- forcats::fct_expand(setlement_level$livelihood_activ.none,c("yes","no"))
+# setlement_level$livelihood_activ.humanitar_assistance <- forcats::fct_expand(setlement_level$livelihood_activ.humanitar_assistance,c("yes","no"))
+# setlement_level$education_available.ngoschool <- forcats::fct_expand(setlement_level$education_available.ngoschool,c("yes","no"))
+# setlement_level$main_radios.radio_xamar <- forcats::fct_expand(setlement_level$main_radios.radio_xamar,c("yes","no"))
+# setlement_level$main_radios.radio_xurmo <- forcats::fct_expand(setlement_level$main_radios.radio_xurmo,c("yes","no"))
+# setlement_level$main_radios.radio_banadir <- forcats::fct_expand(setlement_level$main_radios.radio_banadir,c("yes","no"))
+# setlement_level$main_radios.al_risaala <- forcats::fct_expand(setlement_level$main_radios.al_risaala,c("yes","no"))
+# setlement_level$main_radios.radio_ergo <- forcats::fct_expand(setlement_level$main_radios.radio_ergo,c("yes","no"))
+# setlement_level$conflict_causes.tohumanitarianaid <- forcats::fct_expand(setlement_level$conflict_causes.tohumanitarianaid,c("yes","no"))
+# setlement_level$info_mainsource.social_media <- forcats::fct_expand(setlement_level$info_mainsource.social_media,c("yes","no"))
+# setlement_level$education_available.basic_boys <- forcats::fct_expand(setlement_level$education_available.basic_boys,c("yes","no"))
+# setlement_level$education_available.basic_girls <- forcats::fct_expand(setlement_level$education_available.basic_girls,c("yes","no"))
+setlement_level$people_malnourished <- forcats::fct_expand(setlement_level$people_malnourished,c("yes","no"))
+setlement_level$info_personsource <- forcats::fct_expand(setlement_level$info_personsource,c("yes","no"))
+setlement_level$ngo_support_type.livestock <- forcats::fct_expand(setlement_level$ngo_support_type.livestock,c("yes","no"))
+setlement_level$ngo_support_type.cash_distrib <- forcats::fct_expand(setlement_level$ngo_support_type.cash_distrib,c("yes","no"))
+setlement_level$ngo_support_type.seeds_tools <- forcats::fct_expand(setlement_level$ngo_support_type.seeds_tools,c("yes","no"))
+setlement_level$ngo_support_type.other <- forcats::fct_expand(setlement_level$ngo_support_type.other,c("yes","no"))
+setlement_level$ngo_support_type.vaccinations <- forcats::fct_expand(setlement_level$ngo_support_type.vaccinations,c("yes","no"))
+setlement_level$ngo_support_type.dontknow <- forcats::fct_expand(setlement_level$ngo_support_type.dontknow,c("yes","no"))
+setlement_level$ngo_support_type.food_distrib <- forcats::fct_expand(setlement_level$ngo_support_type.food_distrib,c("yes","no"))
+setlement_level$ngo_support_type.education_service <- forcats::fct_expand(setlement_level$ngo_support_type.education_service,c("yes","no"))
+setlement_level$ngo_support_type.construction_materials_nfis <- forcats::fct_expand(setlement_level$ngo_support_type.construction_materials_nfis,c("yes","no"))
+setlement_level$ngo_support_type.legal_support <- forcats::fct_expand(setlement_level$ngo_support_type.legal_support,c("yes","no"))
 
 
 
@@ -410,7 +422,7 @@ h2r_columns <- setlement_level %>% select(when_left_prev:still_contact_htr, - co
 region_h2r <-butteR::mean_proportion_table(design = dfsvy_h2r_district,
                       list_of_variables = h2r_columns,
                       aggregation_level = "ADM1_NAME",
-                      round_to = 2,
+                      round_to = 1,
                      return_confidence = FALSE,
                      na_replace = FALSE)
 
@@ -512,7 +524,7 @@ list_of_datasets <- list("settlement_aggregation" = setlement_level, "Aggregatio
 #write.xlsx(list_of_datasets, file = "outputs/som_h2r_summary_20200101.xlsx")
 
 
-write.csv(grid_level,"outputs/Aggregation by hex 400km.csv" )
-write.csv(district_level,"outputs/Aggregation by district.csv" )
-write.csv(district_level,"outputs/Aggregation by district.csv" )
-write.csv(setlement_level,"outputs/settlement_aggregation.csv" )
+write.csv(grid_level,"outputs/Mar Aggregation by hex 400km.csv" )
+write.csv(district_level,"outputs/Mar Aggregation by district.csv" )
+write.csv(district_level,"outputs/Mar Aggregation by district.csv" )
+write.csv(setlement_level,"outputs/Mar settlement_aggregation.csv" )

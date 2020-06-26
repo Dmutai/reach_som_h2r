@@ -20,7 +20,7 @@ select_multile_col <-c("available_health_services.none", "available_health_servi
   "available_health_services.drugstore","barriers_health.distance",
   "barriers_health.none", "barriers_health.cost_services", "barriers_health.absence_personnel",
   "barriers_health.other", "barriers_health.dontknow", "barriers_health.security",
-  "barriers_health_other",  "barriers_usetoilets.too_far",
+  "barriers_usetoilets.too_far",
   "barriers_usetoilets.women_notsafe", "barriers_usetoilets.too_dirty",
   "barriers_usetoilets.not_available", "barriers_usetoilets.overcrowded",
   "barriers_usetoilets.pwd_notsafe", "barriers_usetoilets.night_notsafe",
@@ -72,7 +72,7 @@ select_multile_col <-c("available_health_services.none", "available_health_servi
   "info_mainsource.noresponse", "lack_food_reasons.noland",
   "lack_food_reasons.nomarket", "lack_food_reasons.natural_causes",
   "lack_food_reasons.other", "lack_food_reasons.economic_causes",
-  "lack_food_reasons.dontknow", "lack_food_reasons.security", "lack_food_reasons_other",
+  "lack_food_reasons.dontknow", "lack_food_reasons.security", 
   "left_behind_who.men_18_59", "left_behind_who.b_0_11",
   "left_behind_who.women_60_eld", "left_behind_who.boys_12_17",
   "left_behind_who.men_60_eld", "left_behind_who.women_18_59",
@@ -88,17 +88,15 @@ select_multile_col <-c("available_health_services.none", "available_health_servi
   "main_radios.other", "main_radios.voice_of_america", "main_radios.radio_shabelle",
   "main_radios.radio_xurmo", "main_radios.al_risaala", "main_radios.dontknow",
   "main_radios.radio_ergo", "main_radios.star_fm", "main_radios.bbc_somalia",
-  "main_radios.radio_kulmiye", "main_radios.radio_mogadishu", "main_radios_other",
+  "main_radios.radio_kulmiye", "main_radios.radio_mogadishu", 
    "market_goods.clothes_sewing", "market_goods.tools_seeds",
   "market_goods.livestock", "market_goods.food", "market_goods.jerry_cans",
   "market_goods.construction_materials", "market_goods.mosquito_nets",
   "market_goods.womens_materials", "market_goods.fuel_cooking",
   "market_goods.dontknow", "market_goods.soap", "market_goods.shoes",
-   "ngo_support_type.none", "ngo_support_type.livestock",
-  "ngo_support_type.cash_distrib", "ngo_support_type.seeds_tools",
-  "ngo_support_type.other", "ngo_support_type.vaccinations", "ngo_support_type.dontknow",
-  "ngo_support_type.food_distrib", "ngo_support_type.education_service",
-  "ngo_support_type.construction_materials_nfis", "ngo_support_type.legal_support",
+  "ngo_support_type.livestock" ,"ngo_support_type.cash_distrib","ngo_support_type.seeds_tools"   ,
+  "ngo_support_type.other" ,"ngo_support_type.vaccinations" ,"ngo_support_type.dontknow",
+  "ngo_support_type.food_distrib"   , "ngo_support_type.education_service","ngo_support_type.construction_materials_nfis","ngo_support_type.legal_support",
   "noaccess_health.none", "noaccess_health.m_over60",
   "noaccess_health.m_over18", "noaccess_health.g_under18", "noaccess_health.pwd",
   "noaccess_health.other", "noaccess_health.dontknow", "noaccess_health.b_under18",
@@ -126,7 +124,12 @@ not_needed_columns <- c( "start", "end","today", "deviceid", "available_health_s
                         "idp_arrived_reason", "idp_pull_factors", "incidents_wh_leaving","info_barriers", "info_mainsource", "lack_food_reasons",
                         "left_behind_who", "livelihood_activ", "main_radios", "market_goods", "ngo_support_type","noaccess_health","nomarket_why",
                         "protection_inc_location", "protection_incidents","enum_code_baidoa","contact_again", "end_note", "X__version__", "X_id", "X_uuid",
-                        "X_submission_time", "X_index" )
+                        "X_submission_time", "X_index", "X.1", "idp_site", "info_reg", "district_info", "gender_ki", 
+                        "MERGED_FROM_FILE", "X", "enum_code_mogadishu", "idpsite_district", 
+                        "h2r_notice", "hc_push_second_other", "info_personsource_other", 
+                        "ngo_support_type.none", "enum_code_hargeisa", "KI_settlem_type", 
+                        "idpsite_name", "info_settlement_001", "X_version_", "X_version__001"
+                        )
 
 #Select non mutliple select columns
 #non_multiple_df <- df %>% select(everything(),-contains(select_multiple))
@@ -142,22 +145,21 @@ yes_no_colmns <- c( "consent", "still_inhabited", "left_behind_y_n", "pwd_left_b
 
 equal <- c("base",
            "assess_mode", "consent",  "info_settlement",
-           "info_settlement_other", "info_set_oth_near", "label_settlement",
            "when_left_prev", "how_long_stay", "still_inhabited",
            "left_behind_y_n", "pwd_left_behind", "primary_reason_moved",
            "secondary_reason_moved", "idp_proportion_settlem",
           "idp_arrived_from_reg", "idp_arrived_from_district",
            "hc_push_main", "hc_push_second", "access_market", "market_region",
-           "market_district", "market_settlement", "market_settlement_other",
-           "market_settlement_close", "distance_to_market",
+           "market_district", "market_settlement",
+           "distance_to_market",
            "food_situation", "food_source", "people_malnourished", "health_issues",
-           "health_issues_other", "distance_clinic",
-           "region_clinic", "district_clinic_001", "settlement_clinic",
-           "settlement_clinic_other", "settlement_clinic_oth_new", "idp_host_relationships",
+            "distance_clinic",
+           "region_clinic", "district_clinic", "settlement_clinic",
+           "idp_host_relationships",
            "ppl_no_land_tenure",
            "land_tenure_form", "depart_return_safe", "freedommov_day", "freedommov_night",
            "shelter_type", "dam_shelters_reason", 
-          "dam_shelters_reason_other", "shelters_not_rebuilt", "shelt_not_rebuilt_why", 
+           "shelters_not_rebuilt", "shelt_not_rebuilt_why", 
           "mainsource_water", "gettingwater_time", "people_using_latrines",
            "waste_disposal", "time_to_school", "education_bar_girls", "education_bar_boys",
            "info_personsource", "road_connection_y_n",
@@ -191,5 +193,5 @@ settlement_equal_yes <- df %>%
 settlement_mscols <- select_multiple_df %>%
   select(essential_col, select_multile_col) %>%
   group_by_(.dots = c( "calc.region","calc.district","finalsettlment")) %>%
-  summarise_all(funs(AoK))
+  summarise_all(funs(aok_yes))
 
