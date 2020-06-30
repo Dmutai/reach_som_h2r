@@ -77,6 +77,10 @@ df <- Filter(function(x)!all(is.na(x) ), df)
 #Create a new column that combines what was mapped as other and has nearest settlement given, keep only dataset with both columns and records have values
 df <- df %>% filter(!info_settlement=="") %>%  mutate(finalsettlment= ifelse(info_settlement=="other",info_set_oth_near,info_settlement))
 
+#converting all the "dontknow" answers to "NAs"
+
+df[ df == "dontknow" ] <- NA
+
 
 
 #Join with the settlement data as some districts are blank if chosen near settlement
