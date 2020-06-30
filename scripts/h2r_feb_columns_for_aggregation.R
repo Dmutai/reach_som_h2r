@@ -11,7 +11,6 @@ select_multiple_df[select_multiple_df==0]<- "no"
 select_multiple_df[select_multiple_df==1]<- "yes"
 
 
-
 select_multile_col <-c("available_health_services.none", "available_health_services.mobile_clinic",
                        "available_health_services.hospital", "available_health_services.first_aid",
                        "available_health_services.clinic", "available_health_services.other",
@@ -190,5 +189,5 @@ settlement_equal_yes <- df %>%
 settlement_mscols <- select_multiple_df %>%
   select(essential_col, select_multile_col) %>%
   group_by_(.dots = c( "calc.region","calc.district","finalsettlment")) %>%
-  summarise_all(funs(aok_yes))
+  summarise_all(funs(AoK))
 

@@ -193,5 +193,5 @@ settlement_equal_yes <- df %>%
 settlement_mscols <- select_multiple_df %>%
   select(essential_col, select_multile_col) %>%
   group_by_(.dots = c( "calc.region","calc.district","finalsettlment")) %>%
-  summarise_all(funs(aok_yes))
+  summarise_all(funs(AoK))
 

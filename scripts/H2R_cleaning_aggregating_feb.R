@@ -385,19 +385,29 @@ setlement_level <- som_settlements_data %>%  select(name:particip_again) %>% fil
 #Reformatting the datato run in srvyr package for the as_survey function
 
 setlement_level$still_inhabited <- forcats::fct_expand(setlement_level$still_inhabited,c("yes","no"))
+setlement_level$coping_food_strat.none <- forcats::fct_expand(setlement_level$coping_food_strat.none,c("yes","no"))
 setlement_level$livelihood_activ.money_rent <- forcats::fct_expand(setlement_level$livelihood_activ.money_rent,c("yes","no"))
-setlement_level$livelihood_activ.none <- forcats::fct_expand(setlement_level$livelihood_activ.none,c("yes","no"))
+# setlement_level$livelihood_activ.none <- forcats::fct_expand(setlement_level$livelihood_activ.none,c("yes","no"))
 setlement_level$livelihood_activ.humanitar_assistance <- forcats::fct_expand(setlement_level$livelihood_activ.humanitar_assistance,c("yes","no"))
-setlement_level$education_available.ngoschool <- forcats::fct_expand(setlement_level$education_available.ngoschool,c("yes","no"))
+# setlement_level$education_available.ngoschool <- forcats::fct_expand(setlement_level$education_available.ngoschool,c("yes","no"))
 setlement_level$main_radios.radio_xamar <- forcats::fct_expand(setlement_level$main_radios.radio_xamar,c("yes","no"))
+setlement_level$main_radios.radio_simba <- forcats::fct_expand(setlement_level$main_radios.radio_simba,c("yes","no"))
+setlement_level$main_radios.bar_kulan <- forcats::fct_expand(setlement_level$main_radios.bar_kulan,c("yes","no"))
 setlement_level$main_radios.radio_xurmo <- forcats::fct_expand(setlement_level$main_radios.radio_xurmo,c("yes","no"))
 setlement_level$main_radios.radio_banadir <- forcats::fct_expand(setlement_level$main_radios.radio_banadir,c("yes","no"))
+setlement_level$main_radios.africas_voices <- forcats::fct_expand(setlement_level$main_radios.africas_voices,c("yes","no"))
 setlement_level$main_radios.al_risaala <- forcats::fct_expand(setlement_level$main_radios.al_risaala,c("yes","no"))
 setlement_level$main_radios.radio_ergo <- forcats::fct_expand(setlement_level$main_radios.radio_ergo,c("yes","no"))
+setlement_level$main_radios.star_fm <- forcats::fct_expand(setlement_level$main_radios.star_fm,c("yes","no"))
+setlement_level$main_radios.radio_kulmiye <- forcats::fct_expand(setlement_level$main_radios.radio_kulmiye,c("yes","no"))
+setlement_level$main_radios.radio_mogadishu <- forcats::fct_expand(setlement_level$main_radios.radio_mogadishu,c("yes","no"))
 setlement_level$conflict_causes.tohumanitarianaid <- forcats::fct_expand(setlement_level$conflict_causes.tohumanitarianaid,c("yes","no"))
 setlement_level$info_mainsource.social_media <- forcats::fct_expand(setlement_level$info_mainsource.social_media,c("yes","no"))
 setlement_level$education_available.basic_boys <- forcats::fct_expand(setlement_level$education_available.basic_boys,c("yes","no"))
 setlement_level$education_available.basic_girls <- forcats::fct_expand(setlement_level$education_available.basic_girls,c("yes","no"))
+setlement_level$protection_incidents.uxo <- forcats::fct_expand(setlement_level$protection_incidents.uxo,c("yes","no"))
+setlement_level$barriers_usetoilets.pwd_notsafe <- forcats::fct_expand(setlement_level$barriers_usetoilets.pwd_notsafe,c("yes","no"))
+setlement_level$info_mainsource.sms <- forcats::fct_expand(setlement_level$info_mainsource.sms,c("yes","no"))
 
 
 

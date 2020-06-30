@@ -3,13 +3,12 @@
 essential_col <- c("calc.region","calc.district","finalsettlment")
 
 
-
 #select multiple columns variables and change the 0 to no and 1 to yes to be used in the no consensus stage later
-select_multiple<- butteR::auto_detect_select_multiple(df)
+
+select_multiple <- butteR::auto_detect_select_multiple(df)
 select_multiple_df<- select(df,calc.region,calc.district,finalsettlment, contains(select_multiple))
 select_multiple_df[select_multiple_df==0]<- "no"
 select_multiple_df[select_multiple_df==1]<- "yes"
-
 
 
 select_multile_col <-c("available_health_services.none", "available_health_services.mobile_clinic",
