@@ -135,7 +135,7 @@ select_multile_col <-c("available_health_services.none", "available_health_servi
 not_needed_columns <- c( "start", "end","today", "deviceid", "available_health_services","barriers_health", "barriers_usetoilets",
                         "conflict_causes","conflict_mediators","coping_food_strat","education_available",
                         "idp_arrived_reason", "idp_pull_factors", "incidents_wh_leaving","info_barriers", "info_mainsource", "lack_food_reasons",
-                        "left_behind_who", "livelihood_activ", "main_radios", "market_goods", "ngo_support_type","noaccess_health","nomarket_why",
+                        "left_behind_who", "livelihood_activ", "main_radios", "market_goods", "ngo_support_type","noaccess_health","nomarket_why","nomarket_why_short",
                         "protection_inc_location", "protection_incidents","enum_code_baidoa","contact_again", "end_note", "X__version__", "X_id", "X_uuid",
                         "X_submission_time", "X_index", "X.1", "idp_site", "info_reg", "district_info", "gender_ki", 
                         "MERGED_FROM_FILE", "X", "enum_code_mogadishu", "idpsite_district", 
