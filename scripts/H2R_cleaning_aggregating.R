@@ -6,6 +6,7 @@ library(lubridate)
 library(sf)
 library(openxlsx)
 library(srvyr)
+library(rgdal)
 # library(mergekobodata)
 
 
@@ -106,7 +107,7 @@ ki_coverage <- df %>%
 
 
 #table join. Let us merge all these columns/fields into one database
-analysis_df_list<-list(settlement_equal_yes,settlement_mscols)
+analysis_df_list<-list(settlement_equal_yes, settlement_mscols)
 # settlement_joined<-purrr::reduce(analysis_df_list, left_join(by= c("D.info_state","D.info_county", "D.info_settlement")))
 settlement_data <-purrr::reduce(analysis_df_list, left_join)
 
@@ -238,6 +239,9 @@ settlement_data$lack_food_reasons.dontknow[settlement_data$skip_meals != "yes"] 
 settlement_data$lack_food_reasons.security[settlement_data$skip_meals != "yes"] <- "SL"
 settlement_data$lack_food_reasons_other[settlement_data$skip_meals != "yes"] <- "SL"
 
+      #We admit the food situation getting worse for those that reported skipping food 
+settlement_data$food_situation[settlement_data$skip_meals != "yes"] <-  "SL"
+
 
 #Health
 # access_health_services
@@ -357,7 +361,7 @@ settlement_data <- settlement_data %>%  select(base:consent,calc.region, calc.di
 
 write.csv(
   settlement_data,
-  file = "outputs/som_H2r__clean_data_20200101.csv",
+  file = "outputs/som_H2r__clean_data_20200201.csv",
   na = "",
   row.names = FALSE)
 
@@ -501,8 +505,20 @@ grid_level <- grid_400km %>% select(everything(), - contains(c("other","dontknow
 names(grid_level) <- gsub("\\.", "_", names(grid_level))
 
 
+# grid_level_water_food <- grid_level %>% select(grid_level_mapping)
+
+
+# grid400km_map <-  inner_join(hex_400km, grid_level, by = c("GRID_ID" = "hex_4000km")) %>%  
+#   select(everything(), -contains(c("whn_lft_prv_l", "Id", "asss")))
+# 
+# # names(grid_400km_map)[names(grid_400km_map) == "whn_lft_prv_l"] <- "test"
+# names(grid400km_map)[names(grid400km_map) == "asss_"] <- "test_1"
+# 
+# 
+# sf::st_write(grid400km_map,"outputs/shapefiles/grid_400km.shp", delete_layer = TRUE)
 
 #district_level
+
 
 district_level <- district_level %>% select(everything(), - contains(c("other","dontknow","noresponse")))
 names(district_level) <- gsub("\\.", "_", names(district_level))

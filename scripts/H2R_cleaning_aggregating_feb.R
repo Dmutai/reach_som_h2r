@@ -235,7 +235,9 @@ settlement_data$lack_food_reasons.other[settlement_data$skip_meals != "yes"] <- 
 settlement_data$lack_food_reasons.economic_causes[settlement_data$skip_meals != "yes"] <- "SL"
 settlement_data$lack_food_reasons.dontknow[settlement_data$skip_meals != "yes"] <- "SL"
 settlement_data$lack_food_reasons.security[settlement_data$skip_meals != "yes"] <- "SL"
-#settlement_data$lack_food_reasons_other[settlement_data$skip_meals != "yes"] <- "SL"
+
+settlement_data$food_situation[settlement_data$skip_meals != "yes"] <-  "SL"
+
 
 
 #Health
