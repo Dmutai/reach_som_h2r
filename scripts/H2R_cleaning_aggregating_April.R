@@ -31,6 +31,28 @@ admin_gdb<- "inputs/gis_data/boundaries"
 df<-read.csv("inputs/2020_04/h2r_april_may_consolidated_mog_baidoa_clean.csv", stringsAsFactors = FALSE)
 #latest settlement data used
 
+# merging the columns collected using the short tool to the main tool
+
+# no access to markets
+df <- df %>% 
+  mutate(access_market = ifelse(access_market == "", market_access_short, access_market)) %>% 
+  mutate(nomarket_why = ifelse(nomarket_why == "", nomarket_why_short, nomarket_why)) %>% 
+  mutate(nomarket_why.market_far = ifelse(is.na(nomarket_why.market_far) , nomarket_why_short.market_far, nomarket_why.market_far)) %>% 
+  mutate(nomarket_why.road_closed = ifelse(is.na(nomarket_why.road_closed) , nomarket_why_short.road_closed, nomarket_why.road_closed)) %>% 
+  mutate(nomarket_why.concern_transmiting = ifelse(is.na(nomarket_why.concern_transmiting), nomarket_why_short.concern_transmiting, nomarket_why.concern_transmiting)) %>% 
+  mutate(nomarket_why.other = ifelse(is.na(nomarket_why.other), nomarket_why_short.other, nomarket_why.other)) %>%
+  mutate(nomarket_why.no_items = ifelse(is.na(nomarket_why.no_items) , nomarket_why_short.no_items, nomarket_why.no_items)) %>%
+  mutate(nomarket_why.dontknow = ifelse(is.na(nomarket_why.dontknow) , nomarket_why_short.dontknow, nomarket_why.dontknow)) %>%
+  mutate(nomarket_why.security = ifelse(is.na(nomarket_why.security) , nomarket_why_short.security, nomarket_why.security)) %>%
+  mutate(nomarket_why.bad_quality = ifelse(is.na(nomarket_why.bad_quality) , nomarket_why_short.bad_quality, nomarket_why.bad_quality)) %>%
+  mutate(nomarket_why.no_cash = ifelse(is.na(nomarket_why.no_cash) , nomarket_why_short.no_cash, nomarket_why.no_cash)) 
+
+
+
+
+
+
+
 itemset<-read.csv("inputs/2020_01/itemsets.csv", stringsAsFactors = FALSE)
 colnames(itemset)<-paste0("calc.",colnames(itemset))
 
@@ -206,7 +228,7 @@ settlement_data$hc_push_second[settlement_data$visit_lastmonth != "yes"] <- "SL"
       #nomarket
 
 settlement_data$access_market[settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$market_access_short[settlement_data$still_talk_2_someone != "yes"] <- "SL"
+# settlement_data$market_access_short[settlement_data$still_talk_2_someone != "yes"] <- "SL"
 
 
     #access to market long tool
@@ -222,17 +244,17 @@ settlement_data$nomarket_why.bad_quality[settlement_data$access_market != "no_ac
 settlement_data$nomarket_why.no_cash[settlement_data$access_market != "no_access"] <- "SL"
 
 #access to market short tool
-
-settlement_data$nomarket_why_short.market_far[settlement_data$market_access_short != "no_access"] <- "SL"
-settlement_data$nomarket_why_short.road_closed[settlement_data$market_access_short != "no_access"] <- "SL"
-settlement_data$nomarket_why_short.concern_transmiting[settlement_data$market_access_short != "no_access"] <- "SL"
-settlement_data$nomarket_why_short.other[settlement_data$market_access_short != "no_access"] <- "SL"
-settlement_data$nomarket_why_short.no_items[settlement_data$market_access_short != "no_access"] <- "SL"
-settlement_data$nomarket_why_short.dontknow[settlement_data$market_access_short != "no_access"] <- "SL"
-settlement_data$nomarket_why_short.security[settlement_data$market_access_short != "no_access"] <- "SL"
-settlement_data$nomarket_why_short.bad_quality[settlement_data$market_access_short != "no_access"] <- "SL"
-settlement_data$nomarket_why_short.no_cash[settlement_data$market_access_short != "no_access"] <- "SL"
-
+# 
+# settlement_data$nomarket_why_short.market_far[settlement_data$market_access_short != "no_access"] <- "SL"
+# settlement_data$nomarket_why_short.road_closed[settlement_data$market_access_short != "no_access"] <- "SL"
+# settlement_data$nomarket_why_short.concern_transmiting[settlement_data$market_access_short != "no_access"] <- "SL"
+# settlement_data$nomarket_why_short.other[settlement_data$market_access_short != "no_access"] <- "SL"
+# settlement_data$nomarket_why_short.no_items[settlement_data$market_access_short != "no_access"] <- "SL"
+# settlement_data$nomarket_why_short.dontknow[settlement_data$market_access_short != "no_access"] <- "SL"
+# settlement_data$nomarket_why_short.security[settlement_data$market_access_short != "no_access"] <- "SL"
+# settlement_data$nomarket_why_short.bad_quality[settlement_data$market_access_short != "no_access"] <- "SL"
+# settlement_data$nomarket_why_short.no_cash[settlement_data$market_access_short != "no_access"] <- "SL"
+# 
   
   
   
@@ -520,21 +542,6 @@ settlement_data$sources_covid_informaiton.don.t_know[ settlement_data$covid_info
 settlement_data <- settlement_data %>% 
   select(base:consent,calc.region, calc.district,finalsettlment,D.ki_coverage,info_settlement:particip_again)
 
-# merging the columns collected using the short tool to the main tool
-
-  # no access to markets
-settlement_data <- settlement_data %>% 
-  mutate(access_market = ifelse(access_market == "SL", market_access_short, access_market)) %>% 
-  mutate(nomarket_why.market_far = ifelse(nomarket_why.market_far == "SL", nomarket_why_short.market_far, nomarket_why.market_far)) %>% 
-  mutate(nomarket_why.road_closed = ifelse(nomarket_why.road_closed == "SL", nomarket_why_short.road_closed, nomarket_why.road_closed)) %>% 
-  mutate(nomarket_why.concern_transmiting = ifelse(nomarket_why.concern_transmiting == "SL", nomarket_why_short.concern_transmiting, nomarket_why.concern_transmiting)) %>% 
-  mutate(nomarket_why.other = ifelse(nomarket_why.other == "SL", nomarket_why_short.other, nomarket_why.other)) %>%
-  mutate(nomarket_why.no_items = ifelse(nomarket_why.no_items == "SL", nomarket_why_short.no_items, nomarket_why.no_items)) %>%
-  mutate(nomarket_why.dontknow = ifelse(nomarket_why.dontknow == "SL", nomarket_why_short.dontknow, nomarket_why.dontknow)) %>%
-  mutate(nomarket_why.security = ifelse(nomarket_why.security == "SL", nomarket_why_short.security, nomarket_why.security)) %>%
-  mutate(nomarket_why.bad_quality = ifelse(nomarket_why.bad_quality == "SL", nomarket_why_short.bad_quality, nomarket_why.bad_quality)) %>%
-  mutate(nomarket_why.no_cash = ifelse(nomarket_why.no_cash == "SL", nomarket_why_short.no_cash, nomarket_why.no_cash)) 
-  
   
 
 write.csv(

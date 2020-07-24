@@ -113,11 +113,7 @@ select_multile_col <-c("available_health_services.none", "available_health_servi
   "protection_incidents.abduction", "protection_incidents.uxo",
   "protection_incidents.conflict_in_set", "protection_incidents.conflict_other_settlement",
   "protection_incidents.noresponse", "nomarket_why.road_closed", 
-  "nomarket_why.concern_transmiting", "nomarket_why_short", "nomarket_why_short.market_far", 
-  "nomarket_why_short.road_closed", "nomarket_why_short.concern_transmiting", 
-  "nomarket_why_short.other", "nomarket_why_short.no_items", "nomarket_why_short.dontknow", 
-  "nomarket_why_short.security", "nomarket_why_short.bad_quality", 
-  "nomarket_why_short.no_cash", "sources_covid_informaiton.ngos_NGOs", "sources_covid_informaiton.traditional_healers", 
+  "nomarket_why.concern_transmiting", "sources_covid_informaiton.ngos_NGOs", "sources_covid_informaiton.traditional_healers", 
   "sources_covid_informaiton.socail_media", "sources_covid_informaiton.drugstore_Drugstore", 
   "sources_covid_informaiton.family_friends", "sources_covid_informaiton.media_radio_tv", 
   "sources_covid_informaiton.local_leaders", "sources_covid_informaiton.other_specify", 
@@ -175,7 +171,7 @@ equal <- c("base",
            "shelters_not_rebuilt", "shelt_not_rebuilt_why", 
           "mainsource_water", "gettingwater_time", "people_using_latrines",
            "waste_disposal", "time_to_school", "education_bar_girls", "education_bar_boys",
-           "info_personsource", "road_connection_y_n", "food_price_changed", "market_access_short", "nfi_price_changed", "soap_price_changed",
+           "info_personsource", "road_connection_y_n", "food_price_changed", "nfi_price_changed", "soap_price_changed",
           "how_often_provide_health"
             )
 
