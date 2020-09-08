@@ -141,7 +141,7 @@ yes_no_colmns <- c( "consent", "still_inhabited", "left_behind_y_n", "pwd_left_b
                    "freedommov_night", "still_contact_htr", "visit_lastmonth", "idp_new_arrivals", "idp_arrived_from","skip_meals",
                    "access_healthservices","unaccompanied_child_y_n", "cases_eviction", "ppl_no_shelter", "surfacewater_drinking",
                    "water_sufficient_lastmonth","water_seasonal", "stagnant_water_near", "info_ngo_y_n", "ngo_support_y_n", "plane_connection_y_n",
-                   "particip_again")
+                   "particip_again", "dam_shelter")
 
 equal <- c("base",
            "assess_mode", "consent",  "info_settlement",

@@ -147,10 +147,15 @@ not_needed_columns <- c( "start", "end","today", "deviceid", "available_health_s
 
 #yes_no <- non_multiple_df %>%  select_if(function(col) is.character(col) && (col) == "yes")
 
-yes_no_colmns <- c( "visit_lastmonth", "still_talk_2_someone" )
+yes_no_colmns <- c( "consent",
+                   "ppl_no_land_tenure", "depart_return_safe", "freedommov_day",
+                   "freedommov_night",  "visit_lastmonth", "idp_new_arrivals", "idp_arrived_from","skip_meals",
+                   "access_healthservices","unaccompanied_child_y_n", "cases_eviction", "ppl_no_shelter", "surfacewater_drinking",
+                   "water_sufficient_lastmonth","water_seasonal", "stagnant_water_near", "info_ngo_y_n", "ngo_support_y_n", "plane_connection_y_n",
+                   "particip_again", "still_talk_2_someone", "handwashing_access",  "covid_information")
 
-equal <- c("consent", "base","ppl_no_land_tenure", "depart_return_safe", "freedommov_day","freedommov_night",
-          "info_settlement",
+equal <- c("base",
+            "consent",  "info_settlement",
            "idp_proportion_settlem",
           "idp_arrived_from_reg", "idp_arrived_from_district",
            "hc_push_main", "hc_push_second", "access_market", "market_region",
@@ -167,10 +172,7 @@ equal <- c("consent", "base","ppl_no_land_tenure", "depart_return_safe", "freedo
           "mainsource_water", "gettingwater_time", "people_using_latrines",
            "waste_disposal", "time_to_school", "education_bar_girls", "education_bar_boys",
            "info_personsource", "road_connection_y_n", "food_price_changed", "nfi_price_changed", "soap_price_changed",
-          "how_often_provide_health", "idp_new_arrivals", "idp_arrived_from","skip_meals",
-          "access_healthservices","unaccompanied_child_y_n", "cases_eviction", "ppl_no_shelter", "surfacewater_drinking",
-          "water_sufficient_lastmonth","water_seasonal", "stagnant_water_near", "info_ngo_y_n", "ngo_support_y_n", "plane_connection_y_n",
-          "particip_again", "handwashing_access",  "covid_information", "health_workers_available", "dam_shelter"
+          "how_often_provide_health"
             )
 
 
@@ -186,7 +188,7 @@ settlement_yes <- df %>%
 
 
 settlement_equal <- df %>%
-  select(essential_col, equal) %>%
+  select(essential_col, equal_yes_no) %>%
   group_by_(.dots = c( "calc.region","calc.district","finalsettlment")) %>%
   summarise_all(funs(AoK))
 

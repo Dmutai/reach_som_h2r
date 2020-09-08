@@ -22,10 +22,6 @@ source("scripts/functions/aok_aggregate_by_county_wrapped.R")
 #Spatial data folder_path
 admin_gdb<- "inputs/gis_data/boundaries"
 
-#Additional scripts to use incase there are several files to be merged
-# merge Mogadishu and Baidoa clean data
-# merge_kobo_data("inputs/2020_02/",".csv", output_file = "inputs/2020_02/h2r_feb_consolidated_mog_baidoa_clean.csv")
-
 
 
 #Clean data
@@ -356,12 +352,13 @@ settlement_data$ngo_support_type.legal_support[settlement_data$ngo_support_y_n !
 
 
 
-settlement_data <- settlement_data %>%  select(base:consent,calc.region, calc.district,finalsettlment,D.ki_coverage,info_settlement:particip_again)
+settlement_data <- settlement_data %>%  select(base:consent,calc.region, calc.district,finalsettlment,D.ki_coverage,info_settlement:particip_again) %>% 
+  filter(D.ki_coverage > 1)
 
 
 write.csv(
   settlement_data,
-  file = "outputs/som_H2r__clean_data_20200201.csv",
+  file = "outputs/som_H2r__clean_data_20200101.csv",
   na = "",
   row.names = FALSE)
 
@@ -403,6 +400,18 @@ setlement_level$info_mainsource.internet <- forcats::fct_expand(setlement_level$
 setlement_level$main_radios.radio_banadir <- forcats::fct_expand(setlement_level$main_radios.radio_banadir, c("yes", "no"))
 setlement_level$main_radios.al_risaala <- forcats::fct_expand(setlement_level$main_radios.al_risaala, c("yes", "no"))
 setlement_level$info_barriers.written_info_illiterate <- forcats::fct_expand(setlement_level$info_barriers.written_info_illiterate, c("yes", "no"))
+
+setlement_level$market_settlement_close <- forcats::fct_expand(setlement_level$market_settlement_close, c("yes", "no"))
+setlement_level$district_clinic_001 <- forcats::fct_expand(setlement_level$district_clinic_001, c("yes", "no"))
+setlement_level$settlement_clinic_oth_new <- forcats::fct_expand(setlement_level$settlement_clinic_oth_new, c("yes", "no"))
+setlement_level$barriers_health.none <- forcats::fct_expand(setlement_level$barriers_health.none, c("yes", "no"))
+setlement_level$protection_incidents.uxo <- forcats::fct_expand(setlement_level$protection_incidents.uxo, c("yes", "no"))
+setlement_level$barriers_usetoilets.overcrowded <- forcats::fct_expand(setlement_level$barriers_usetoilets.overcrowded, c("yes", "no"))
+setlement_level$education_available.basic_boys <- forcats::fct_expand(setlement_level$education_available.basic_boys, c("yes", "no"))
+setlement_level$education_available.basic_girls <- forcats::fct_expand(setlement_level$education_available.basic_girls, c("yes", "no"))
+
+setlement_level$main_radios.al_furqaan <- forcats::fct_expand(setlement_level$main_radios.al_furqaan, c("yes", "no"))
+setlement_level$main_radios.radio_ergo <- forcats::fct_expand(setlement_level$main_radios.radio_ergo, c("yes", "no"))
 
 
 

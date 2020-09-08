@@ -8,6 +8,7 @@ library(openxlsx)
 library(srvyr)
 library(mergekobodata)
 
+
 #Call in the data we will use
 
 
@@ -21,8 +22,8 @@ source("scripts/functions/aok_aggregate_by_county_wrapped.R")
 admin_gdb<- "inputs/gis_data/boundaries"
 
 #Additional scripts to use incase there are several files to be merged
-# merge Mogadishu and Baidoa clean data
-#merge_kobo_data("inputs/2020_04/",".csv", output_file = "inputs/2020_04/h2r_april_may_consolidated_mog_baidoa_clean.csv")
+ # merge Mogadishu and Baidoa clean data
+# merge_kobo_data("inputs/2020_04/",".csv", output_file = "inputs/2020_04/h2r_april_may_consolidated_mog_baidoa_clean.csv")
 
 
 
@@ -30,38 +31,8 @@ admin_gdb<- "inputs/gis_data/boundaries"
 df<-read.csv("inputs/2020_04/h2r_april_may_consolidated_mog_baidoa_clean.csv", stringsAsFactors = FALSE)
 #latest settlement data used
 
-# merging the columns collected using the short tool to the main tool
+ 
 
-# no access to markets
-df <- df %>% 
-  mutate(access_market = ifelse(access_market == "", market_access_short, access_market)) %>%
-  mutate(nomarket_why = ifelse(nomarket_why == "", nomarket_why_short, nomarket_why)) %>%
-  mutate(nomarket_why.market_far = ifelse(is.na(nomarket_why.market_far) , nomarket_why_short.market_far, nomarket_why.market_far)) %>%
-  mutate(nomarket_why.road_closed = ifelse(is.na(nomarket_why.road_closed) , nomarket_why_short.road_closed, nomarket_why.road_closed)) %>%
-  mutate(nomarket_why.concern_transmiting = ifelse(is.na(nomarket_why.concern_transmiting), nomarket_why_short.concern_transmiting, nomarket_why.concern_transmiting)) %>%
-  mutate(nomarket_why.other = ifelse(is.na(nomarket_why.other), nomarket_why_short.other, nomarket_why.other)) %>%
-  mutate(nomarket_why.no_items = ifelse(is.na(nomarket_why.no_items) , nomarket_why_short.no_items, nomarket_why.no_items)) %>%
-  mutate(nomarket_why.dontknow = ifelse(is.na(nomarket_why.dontknow) , nomarket_why_short.dontknow, nomarket_why.dontknow)) %>%
-  mutate(nomarket_why.security = ifelse(is.na(nomarket_why.security) , nomarket_why_short.security, nomarket_why.security)) %>%
-  mutate(nomarket_why.bad_quality = ifelse(is.na(nomarket_why.bad_quality) , nomarket_why_short.bad_quality, nomarket_why.bad_quality)) %>%
-  mutate(nomarket_why.no_cash = ifelse(is.na(nomarket_why.no_cash) , nomarket_why_short.no_cash, nomarket_why.no_cash))
-
-
-# 
-    #adding healthcare workers availability column 
-  # This will be used to analyse the Health workers access 
-
-df <- df %>% 
-  mutate(health_workers_available = case_when((how_often_provide_health =="once_a_week") ~ "yes",
-                                              how_often_provide_health == "2_3_times_month" ~ "yes",
-                                              how_often_provide_health == "once_a_month" ~ "yes",
-                                              how_often_provide_health == "less_frequently" ~ "yes",
-                                              TRUE ~ "no")) %>% 
-  mutate(dam_shelter = case_when((dam_shelters_reason == "flooding") ~ "yes",
-                                        dam_shelters_reason == "conflict_looting" ~ "yes",
-                                        dam_shelters_reason == "fire" ~ "yes",
-                                        TRUE ~ "no"))
-         
 
 
 
@@ -69,12 +40,12 @@ itemset<-read.csv("inputs/2020_01/itemsets.csv", stringsAsFactors = FALSE)
 colnames(itemset)<-paste0("calc.",colnames(itemset))
 
 #Baidoa data collection tool
-# a <- loadWorkbook ( "inputs/2020_04/H2R_remote_short_long_Baidoa.xlsx")
-# sheetNames <- sheets(a)
-# for(i in 1:length(sheetNames))
-# {
-#   assign(sheetNames[i],readWorkbook(a,sheet = i))
-# }
+ a <- loadWorkbook ( "inputs/2020_04/H2R_remote_short_long_Baidoa.xlsx")
+ sheetNames <- sheets(a)
+ for(i in 1:length(sheetNames))
+ {
+   assign(sheetNames[i],readWorkbook(a,sheet = i))
+ }
 
 
 # Spatial files regional, district, 10km hex, 6.7hm hex and settlments files
@@ -114,7 +85,6 @@ df <- df %>% filter(!info_settlement=="") %>%  mutate(finalsettlment= ifelse(inf
 #converting all the "dontknow" answers to "NAs"
 
 df[ df == "dontknow" ] <- NA
-df[ df == ""] <- NA
 
 
 #Join with the settlement data as some districts are blank if chosen near settlement
@@ -140,7 +110,7 @@ ki_coverage <- df %>%
 
 
 #table join. Let us merge all these columns/fields into one database
-analysis_df_list<-list(settlement_yes, settlement_equal, settlement_mscols)
+analysis_df_list<-list(settlement_equal_yes,settlement_mscols)
 # settlement_joined<-purrr::reduce(analysis_df_list, left_join(by= c("D.info_state","D.info_county", "D.info_settlement")))
 settlement_data <-purrr::reduce(analysis_df_list, left_join)
 
@@ -165,8 +135,6 @@ if(length(check_these>0)){
   print("WARNING you missed these: ")
   check_these %>% dput()
 }
-
-
 
 #Now we want to clean the data for some skiplogic (SL) errors introduced after settlement level aggregation.
 
@@ -195,12 +163,7 @@ if(length(check_these>0)){
 #Settlement Profile
 #idp_proportion
 
-settlement_data$idp_proportion_settlem[settlement_data$visit_lastmonth != "yes"] <- "SL"
-# settlement_data <- settlement_data %>% 
-   # mutate(visit_lastmonth = case_when(visit_lastmonth == "NC" ~ "yes",
-                                            # TRUE ~ visit_lastmonth))
-
-settlement_data$idp_proportion_settlem[settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$idp_proportion_settlem[ settlement_data$visit_lastmonth != "yes"] <- "SL"
 
 settlement_data$idp_new_arrivals[settlement_data$idp_proportion_settlem == "no_idps" |settlement_data$idp_proportion_settlem == "dontknow" ] <- "SL"
 
@@ -247,7 +210,7 @@ settlement_data$hc_push_second[settlement_data$visit_lastmonth != "yes"] <- "SL"
    #all answers with SL based on access_market
       #nomarket
 
-# settlement_data$access_market[settlement_data$visit_lastmonth != "yes" & settlement_data$still_talk_2_someone != "yes"] <- "SL"
+settlement_data$access_market[settlement_data$visit_lastmonth != "yes"] <- "SL"
 # settlement_data$market_access_short[settlement_data$still_talk_2_someone != "yes"] <- "SL"
 
 
@@ -274,12 +237,12 @@ settlement_data$nomarket_why.no_cash[settlement_data$access_market != "no_access
 # settlement_data$nomarket_why_short.security[settlement_data$market_access_short != "no_access"] <- "SL"
 # settlement_data$nomarket_why_short.bad_quality[settlement_data$market_access_short != "no_access"] <- "SL"
 # settlement_data$nomarket_why_short.no_cash[settlement_data$market_access_short != "no_access"] <- "SL"
-
+# 
   
-
-
+  
+  
 #market location
-settlement_data$market_region[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_region[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes" ] <- "SL"
 
 settlement_data$market_district[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" | settlement_data$visit_lastmonth != "yes"] <- "SL"
 
@@ -394,10 +357,6 @@ settlement_data$settlement_clinic[settlement_data$available_health_services.clin
 
 # Protection
     # Protection related
-
-
-
-
 settlement_data$idp_host_relationships[settlement_data$idp_proportion_settlem == "no_idps" | settlement_data$idp_proportion_settlem == "dontknow" | settlement_data$visit_lastmonth != "yes"] <- "SL"
     # conflict causes
 settlement_data$conflict_causes.tax_dispute[settlement_data$visit_lastmonth != "yes"] <- "SL"
@@ -494,8 +453,7 @@ settlement_data$barriers_usetoilets.other[ settlement_data$visit_lastmonth != "y
 settlement_data$barriers_usetoilets.child_notsafe[ settlement_data$visit_lastmonth != "yes"] <- "SL"
 
   # #waste disposal
-settlement_data$waste_disposal[ settlement_data$visit_lastmonth != "yes"] <- "SL"  
-
+settlement_data$waste_disposal[ settlement_data$visit_lastmonth != "yes"] <- "SL"
 
 
 
@@ -564,9 +522,8 @@ settlement_data$sources_covid_informaiton.healthcare_workers[ settlement_data$co
 settlement_data$sources_covid_informaiton.don.t_know[ settlement_data$covid_information != "yes"] <- "SL"
 
 
-
 settlement_data <- settlement_data %>% 
-  select(base:consent,calc.region, calc.district,finalsettlment,D.ki_coverage,info_settlement:dam_shelter) %>%
+  select(base:consent,calc.region, calc.district,finalsettlment,D.ki_coverage,info_settlement:particip_again) %>% 
   filter(D.ki_coverage > 1)
 
   
@@ -594,15 +551,13 @@ names(som_settlements_data)[names(som_settlements_data) == "GRID_ID"] <- "hex_40
 #Settlement data with hexagons information
 
 som_settlements_data <- som_settlements_data %>%
-  select(OBJECTID_1,name,ADM1_NAME,ADM2_NAME,hex_4000km,base,consent,finalsettlment:dam_shelter,geometry)
+  select(OBJECTID_1,name,ADM1_NAME,ADM2_NAME,hex_4000km,base,consent,finalsettlment:particip_again,geometry)
 
 
-setlement_level <- som_settlements_data %>%  select(name:dam_shelter) %>% filter(!is.na(D.ki_coverage))
+setlement_level <- som_settlements_data %>%  select(name:particip_again) %>% filter(!is.na(D.ki_coverage))
 
 #Reformatting the datato run in srvyr package for the as_survey function
 
-
-setlement_level$visit_lastmonth <- forcats::fct_expand(setlement_level$visit_lastmonth,c("yes","no"))
 
 setlement_level$idp_arrived_from <- forcats::fct_expand(setlement_level$idp_arrived_from,c("yes","no"))
 setlement_level$idp_arrived_from_reg <- forcats::fct_expand(setlement_level$idp_arrived_from_reg,c("yes","no"))
@@ -645,13 +600,12 @@ setlement_level$barriers_health.none <- forcats::fct_expand(setlement_level$barr
 setlement_level$incidents_wh_leaving.tax_toleave <- forcats::fct_expand(setlement_level$incidents_wh_leaving.tax_toleave,c("yes","no"))
 
 
-
 dfsvy_h2r_district <-srvyr::as_survey(setlement_level)
 
 
 
 h2r_columns <- setlement_level %>% 
-  select(visit_lastmonth:dam_shelter, - contains(c("other","dontknow","noresponse"))) %>% 
+  select(visit_lastmonth:particip_again, - contains(c("other","dontknow","noresponse"))) %>% 
   colnames() %>% 
   dput()
 
@@ -772,9 +726,9 @@ write.csv(setlement_level,"outputs/April_may settlement_aggregation.csv" )
 #Export FS columns
 
 grid_level_fs <- grid_level %>% 
-  select(c( "hex_4000km" ,"ki_num","assessed_num", "food_price_changed_prices_increased","education_available_none_yes", 
-            "access_healthservices_no", "health_workers_available_yes", "protection_incidents_none_no", "dam_shelter_yes", 
-            "handwashing_access_no", "covid_information_no"))
+  select(c( "hex_4000km" ,"ki_num","assessed_num", "education_available_none_yes", "access_market_yes_always","skip_meals_yes", "food_situation_worse", "access_healthservices_no", 
+            "available_health_services_mobile_clinic_yes","conflict_causes_none_no", "protection_incidents_none_no", "mainsource_water_river_pond","conflict_causes_water_dispute_no",
+            "info_mainsource_radio_yes", "dam_shelters_reason_no_destroyed"))
 write.csv(grid_level_fs, "outputs/fs_April_Aggreg_by_hex_400km.csv")
 
 

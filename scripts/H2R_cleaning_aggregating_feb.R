@@ -353,7 +353,8 @@ settlement_data$ngo_support_type.legal_support[settlement_data$ngo_support_y_n !
 
 
 
-settlement_data <- settlement_data %>%  select(base:consent,calc.region, calc.district,finalsettlment,D.ki_coverage,info_settlement:particip_again)
+settlement_data <- settlement_data %>%  select(base:consent,calc.region, calc.district,finalsettlment,D.ki_coverage,info_settlement:particip_again) %>% 
+  filter(D.ki_coverage > 1)
 
 
 write.csv(
@@ -410,6 +411,47 @@ setlement_level$education_available.basic_girls <- forcats::fct_expand(setlement
 setlement_level$protection_incidents.uxo <- forcats::fct_expand(setlement_level$protection_incidents.uxo,c("yes","no"))
 setlement_level$barriers_usetoilets.pwd_notsafe <- forcats::fct_expand(setlement_level$barriers_usetoilets.pwd_notsafe,c("yes","no"))
 setlement_level$info_mainsource.sms <- forcats::fct_expand(setlement_level$info_mainsource.sms,c("yes","no"))
+
+setlement_level$idp_arrived_from <- forcats::fct_expand(setlement_level$idp_arrived_from,c("yes","no"))
+setlement_level$idp_arrived_from_reg <- forcats::fct_expand(setlement_level$idp_arrived_from_reg,c("yes","no"))
+setlement_level$idp_arrived_from_district <- forcats::fct_expand(setlement_level$idp_arrived_from_district,c("yes","no"))
+
+setlement_level$idp_arrived_reason.lack_jobs <- forcats::fct_expand(setlement_level$idp_arrived_reason.lack_jobs,c("yes","no"))
+setlement_level$idp_arrived_reason.no_services <- forcats::fct_expand(setlement_level$idp_arrived_reason.no_services,c("yes","no"))
+setlement_level$idp_arrived_reason.evictions <- forcats::fct_expand(setlement_level$idp_arrived_reason.evictions,c("yes","no"))
+setlement_level$idp_arrived_reason.drought <- forcats::fct_expand(setlement_level$idp_arrived_reason.drought,c("yes","no"))
+setlement_level$idp_arrived_reason.flooding <- forcats::fct_expand(setlement_level$idp_arrived_reason.flooding,c("yes","no"))
+setlement_level$idp_arrived_reason.conflict <- forcats::fct_expand(setlement_level$idp_arrived_reason.conflict,c("yes","no"))
+setlement_level$idp_pull_factors.better_security <- forcats::fct_expand(setlement_level$idp_pull_factors.better_security,c("yes","no"))
+setlement_level$idp_pull_factors.better_services <- forcats::fct_expand(setlement_level$idp_pull_factors.better_services,c("yes","no"))
+setlement_level$idp_pull_factors.presence_jobs <- forcats::fct_expand(setlement_level$idp_pull_factors.presence_jobs,c("yes","no"))
+setlement_level$idp_pull_factors.availability_shelters <- forcats::fct_expand(setlement_level$idp_pull_factors.availability_shelters,c("yes","no"))
+setlement_level$idp_pull_factors.access_water <- forcats::fct_expand(setlement_level$idp_pull_factors.access_water,c("yes","no"))
+setlement_level$idp_pull_factors.access_food <- forcats::fct_expand(setlement_level$idp_pull_factors.access_food,c("yes","no"))
+
+setlement_level$coping_food_strat.wild_foods <- forcats::fct_expand(setlement_level$coping_food_strat.wild_foods,c("yes","no"))
+
+setlement_level$barriers_health.none <- forcats::fct_expand(setlement_level$barriers_health.none,c("yes","no"))
+
+setlement_level$conflict_causes.food_dispute <- forcats::fct_expand(setlement_level$conflict_causes.food_dispute,c("yes","no"))
+
+setlement_level$incidents_wh_leaving.relatives_targeted <- forcats::fct_expand(setlement_level$incidents_wh_leaving.relatives_targeted,c("yes","no"))
+
+setlement_level$barriers_usetoilets.night_notsafe <- forcats::fct_expand(setlement_level$barriers_usetoilets.night_notsafe,c("yes","no"))
+
+setlement_level$education_available.ngoschool <- forcats::fct_expand(setlement_level$education_available.ngoschool,c("yes","no"))
+
+setlement_level$info_barriers.written_info_illiterate <- forcats::fct_expand(setlement_level$info_barriers.written_info_illiterate,c("yes","no"))
+
+setlement_level$ngo_support_type.none <- forcats::fct_expand(setlement_level$ngo_support_type.none,c("yes","no"))
+setlement_level$ngo_support_type.livestock <- forcats::fct_expand(setlement_level$ngo_support_type.livestock,c("yes","no"))
+setlement_level$ngo_support_type.cash_distrib <- forcats::fct_expand(setlement_level$ngo_support_type.cash_distrib,c("yes","no"))
+setlement_level$ngo_support_type.seeds_tools <- forcats::fct_expand(setlement_level$ngo_support_type.seeds_tools,c("yes","no"))
+setlement_level$ngo_support_type.vaccinations <- forcats::fct_expand(setlement_level$ngo_support_type.vaccinations,c("yes","no"))
+setlement_level$ngo_support_type.food_distrib <- forcats::fct_expand(setlement_level$ngo_support_type.cash_distrib,c("yes","no"))
+setlement_level$ngo_support_type.education_service <- forcats::fct_expand(setlement_level$ngo_support_type.education_service,c("yes","no"))
+setlement_level$ngo_support_type.construction_materials_nfis <- forcats::fct_expand(setlement_level$ngo_support_type.construction_materials_nfis,c("yes","no"))
+setlement_level$ngo_support_type.legal_support <- forcats::fct_expand(setlement_level$ngo_support_type.legal_support,c("yes","no"))
 
 
 
