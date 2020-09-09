@@ -57,7 +57,8 @@ select_multile_col <-c("available_health_services.none", "available_health_servi
   "idp_pull_factors.better_services", "idp_pull_factors.presence_jobs",
   "idp_pull_factors.availability_shelters", "idp_pull_factors.other",
   "idp_pull_factors.access_water", "idp_pull_factors.dontknow",
-  "idp_pull_factors.access_food",  "incidents_wh_leaving.loss_property",
+  "idp_pull_factors.access_food",
+  "incidents_wh_leaving.loss_property",
   "incidents_wh_leaving.none", "incidents_wh_leaving.family_separation",
   "incidents_wh_leaving.killing", "incidents_wh_leaving.tax_toleave",
   "incidents_wh_leaving.other", "incidents_wh_leaving.sexual_violence",
@@ -147,17 +148,11 @@ not_needed_columns <- c( "start", "end","today", "deviceid", "available_health_s
 
 #yes_no <- non_multiple_df %>%  select_if(function(col) is.character(col) && (col) == "yes")
 
-yes_no_colmns <- c( "consent",
-                   "ppl_no_land_tenure", "depart_return_safe", "freedommov_day",
-                   "freedommov_night",  "visit_lastmonth", "idp_new_arrivals", "idp_arrived_from","skip_meals",
-                   "access_healthservices","unaccompanied_child_y_n", "cases_eviction", "ppl_no_shelter", "surfacewater_drinking",
-                   "water_sufficient_lastmonth","water_seasonal", "stagnant_water_near", "info_ngo_y_n", "ngo_support_y_n", "plane_connection_y_n",
-                   "particip_again", "still_talk_2_someone", "handwashing_access",  "covid_information")
+yes_no_colmns <- c( "visit_lastmonth", "still_talk_2_someone" )
 
-equal <- c("base",
-            "consent",  "info_settlement",
-           "idp_proportion_settlem",
-          "idp_arrived_from_reg", "idp_arrived_from_district",
+equal <- c("consent", "base","ppl_no_land_tenure", "depart_return_safe", "freedommov_day","freedommov_night",
+          "info_settlement",
+           "idp_proportion_settlem","idp_arrived_from", "idp_arrived_from_reg", "idp_arrived_from_district",
            "hc_push_main", "hc_push_second", "access_market", "market_region",
            "market_district", "market_settlement",
            "distance_to_market",
@@ -172,7 +167,10 @@ equal <- c("base",
           "mainsource_water", "gettingwater_time", "people_using_latrines",
            "waste_disposal", "time_to_school", "education_bar_girls", "education_bar_boys",
            "info_personsource", "road_connection_y_n", "food_price_changed", "nfi_price_changed", "soap_price_changed",
-          "how_often_provide_health"
+          "how_often_provide_health", "idp_new_arrivals","skip_meals",
+          "access_healthservices","unaccompanied_child_y_n", "cases_eviction", "ppl_no_shelter", "surfacewater_drinking",
+          "water_sufficient_lastmonth","water_seasonal", "stagnant_water_near", "info_ngo_y_n", "ngo_support_y_n", "plane_connection_y_n",
+          "particip_again", "handwashing_access",  "covid_information", "health_workers_available", "dam_shelter"
             )
 
 
@@ -188,7 +186,7 @@ settlement_yes <- df %>%
 
 
 settlement_equal <- df %>%
-  select(essential_col, equal_yes_no) %>%
+  select(essential_col, equal) %>%
   group_by_(.dots = c( "calc.region","calc.district","finalsettlment")) %>%
   summarise_all(funs(AoK))
 
