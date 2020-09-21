@@ -1,5 +1,5 @@
 library(tidyverse)
-library(butteR)
+library(butteR) #Elliott: you can my fork to fix a problem, while Zack validate the pull request: remotes::install_github("elliottmess/butter)
 library(koboloadeR)
 library(survey)
 library(lubridate)
@@ -55,7 +55,7 @@ df <- df %>%
   mutate(health_workers_available = case_when((how_often_provide_health =="once_a_week") ~ "yes",
                                               how_often_provide_health == "2_3_times_month" ~ "yes",
                                               how_often_provide_health == "once_a_month" ~ "yes",
-                                              how_often_provide_health == "less_frequently" ~ "yes",
+                                              how_often_provide_health == "less_frequently" ~ "yes", #Elliott: Less than once a month could considered as a no
                                               TRUE ~ "no")) %>% 
   mutate(dam_shelter = case_when((dam_shelters_reason == "flooding") ~ "yes",
                                         dam_shelters_reason == "conflict_looting" ~ "yes",
@@ -127,10 +127,6 @@ item_geo <- distinct(item_geo,finalsettlment, .keep_all= TRUE)
 
 df <- left_join(df,item_geo, by = "finalsettlment")
 
-
-#Ki- settlement level aggregation----------
-#Columns select beased function applied
-
 source("scripts/h2r_june_columns_for_aggregation.R")
 
 ki_coverage <- df %>%
@@ -167,7 +163,6 @@ if(length(check_these>0)){
 }
 
 
-
 #Now we want to clean the data for some skiplogic (SL) errors introduced after settlement level aggregation.
 
 # KI info
@@ -192,10 +187,50 @@ if(length(check_these>0)){
 
 
 
+###Elliott: Proposition to identify skip logics: you can use koboquest: remotes::install_githubt("impact-initiatives/koboquest").
+# It would need a bit more work to be fully implemented, but it could be less error prone than recoding every month individually or
+#  if you have to make a change to the form.
+# library(koboquest)
+# #Elliott: then load questionnaire:
+# survey <- read.csv("inputs/H2R_remote_short_long_Mogadishu_survey.csv", stringsAsFactors = F)
+# choices <- read.csv("inputs/H2R_remote_short_long_Mogadishu_choices.csv", stringsAsFactors = F)
+# #Elliott: creating the questionnaire koboquest object (it's a function, which is a pretty counter-intuitive (at least to me)).
+# settlement_data <- settlement_data
+# questionnaire <- load_questionnaire(settlement_data, choices = choices, questions = survey)
+## Replacing the concatenate select multiple columns to have the functions working.
+# select_multiple_col <- butteR::auto_detect_select_multiple(settlement_data)
+# 
+# 
+# for(i in 1:length(select_multiple_col)){
+#   var_name <- paste0(select_multiple_col[i])
+#   min_index <- min(grep(select_multiple_col[i], names(settlement_data)))
+#   settlement_data <- add_column(settlement_data, !!var_name := NA, .before = min_index)
+# }
+# 
+# 
+# # # #Elliott: Identifying skipLogics in form
+# which_skipLogic <- map(names(settlement_data), function(x)questionnaire_moga$question_is_skipped(question.name = x, data = settlement_data))%>%
+#   as.data.frame()
+# 
+# 
+# names(which_skipLogic) <- names(settlement_data)
+# 
+# #Elliott: New df with SLs identified
+# settlement_data <- map2(settlement_data,which_skipLogic, replace, "SL")%>%
+#   as.data.frame()
+# 
+
+#Ki- settlement level aggregation----------
+#Columns select beased function applied
+
+
+
+
 #Settlement Profile
 #idp_proportion
 
 settlement_data$idp_proportion_settlem[settlement_data$visit_lastmonth != "yes"] <- "SL"
+
 # settlement_data <- settlement_data %>% 
    # mutate(visit_lastmonth = case_when(visit_lastmonth == "NC" ~ "yes",
                                             # TRUE ~ visit_lastmonth))
@@ -205,7 +240,6 @@ settlement_data$idp_proportion_settlem[settlement_data$visit_lastmonth != "yes"]
 settlement_data$idp_new_arrivals[settlement_data$idp_proportion_settlem == "no_idps" |settlement_data$idp_proportion_settlem == "dontknow" ] <- "SL"
 
 #idp_new_arrivals
-
 
 settlement_data$idp_arrived_from[settlement_data$idp_new_arrivals != "yes" | settlement_data$visit_lastmonth != "yes" ] <- "SL"
 
@@ -309,7 +343,6 @@ settlement_data$skip_meals[ settlement_data$visit_lastmonth != "yes"] <- "SL"
 settlement_data$food_situation[ settlement_data$visit_lastmonth != "yes"] <- "SL"
 
   #lack food reasons
-
 settlement_data$lack_food_reasons.noland[settlement_data$skip_meals != "yes"|  settlement_data$visit_lastmonth != "yes"] <- "SL"
 settlement_data$lack_food_reasons.nomarket[settlement_data$skip_meals != "yes"|  settlement_data$visit_lastmonth != "yes"] <- "SL"
 settlement_data$lack_food_reasons.natural_causes[settlement_data$skip_meals != "yes"|  settlement_data$visit_lastmonth != "yes"] <- "SL"
@@ -601,7 +634,6 @@ setlement_level <- som_settlements_data %>%  select(name:dam_shelter) %>% filter
 
 #Reformatting the datato run in srvyr package for the as_survey function
 
-
 # setlement_level$visit_lastmonth <- forcats::fct_expand(setlement_level$visit_lastmonth,c("yes","no"))
 
 setlement_level$idp_arrived_from <- forcats::fct_expand(setlement_level$idp_arrived_from,c("yes","no"))
@@ -661,16 +693,53 @@ setlement_level$covid_measures.using_sanitizers <- forcats::fct_expand(setlement
 setlement_level$covid_measures.isolate_people_with_syspthoms <- forcats::fct_expand(setlement_level$covid_measures.isolate_people_with_syspthoms,c("yes","no"))
 setlement_level$covid_measures.keeping_people <- forcats::fct_expand(setlement_level$covid_measures.keeping_people,c("yes","no"))
 
-
+setlement_level$how_often_provide_health <- as.factor(setlement_level$how_often_provide_health) #Elliott: Converting to factor so can be passed to butteR::mean_proportion_table
+setlement_level$barriers_health.other <- forcats::fct_expand(setlement_level$barriers_health.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$barriers_health.dontknow <- forcats::fct_expand(setlement_level$barriers_health.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$protection_incidents.other <- forcats::fct_expand(setlement_level$protection_incidents.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$incidents_wh_leaving.other <- forcats::fct_expand(setlement_level$incidents_wh_leaving.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$education_available.other <- forcats::fct_expand(setlement_level$education_available.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$education_available.dontknow <- forcats::fct_expand(setlement_level$education_available.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$info_mainsource.other <- forcats::fct_expand(setlement_level$info_mainsource.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$info_mainsource.dontknow <- forcats::fct_expand(setlement_level$info_mainsource.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$info_mainsource.noresponse <- forcats::fct_expand(setlement_level$info_mainsource.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$info_barriers.other <- forcats::fct_expand(setlement_level$info_barriers.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$ngo_support_type.other <- forcats::fct_expand(setlement_level$ngo_support_type.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
 
 dfsvy_h2r_district <-srvyr::as_survey(setlement_level)
 
 
 
 h2r_columns <- setlement_level %>% 
-  select(visit_lastmonth:dam_shelter, - contains(c("other","dontknow","noresponse"))) %>% 
+  select(visit_lastmonth:dam_shelter, - contains(c("other","dontknow","noresponse"))) %>%
   colnames() %>% 
   dput()
+h2r_columns <- h2r_columns[!h2r_columns %in% "geometry"] #Elliott: Removing geometry as it sticks around
+
+
+
+#####Elliott: You will find below a proposition for a functional way of re-factoring variables that are in your h2r_columns. This would avoid the error-prone re-facotring above.
+#Elliott: function to mainstream the coding used above.
+# expend_fct_yesNo <- function(df, col){
+#   df <- as.data.frame(df)
+#   if(class(df[,col]) %in% c("character", "factor") & length(levels(df[,col]))==0){
+#     forcats::fct_expand(df[,col],c("yes","no"))
+#   }else{
+#   df[,col]
+#   }
+# }
+# 
+# setlement_level_fct_recoding <- setlement_level%>% # You can apply the function too the whole dataset for h2r_columns. Of course this supports any type of custom lists of columns.
+#   mutate_at(h2r_columns, expend_fct_yesNo)
+
+# svy_setlement_level_fct_recoding <- as_survey(setlement_level_fct_recoding)
+
+# region_h2r_recoded <-butteR::mean_proportion_table(design = svy_setlement_level_fct_recoding,
+#                                            list_of_variables = h2r_columns,
+#                                            aggregation_level = "ADM1_NAME",
+#                                            round_to = 1,
+#                                            return_confidence = FALSE,
+#                                            na_replace = FALSE)
 
 
 
