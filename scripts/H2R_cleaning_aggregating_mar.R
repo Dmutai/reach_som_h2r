@@ -34,7 +34,7 @@ df<-read.csv("inputs/2020_03/h2r_mar_consolidated_mog_baidoa_clean.csv", strings
 # add column for the damaged shelters
 
 df <- df%>% 
-  mutate(dam_shelter = case_when(dam_shelters_reason == "flooding" ~ "yeS",
+  mutate(dam_shelter = case_when(dam_shelters_reason == "flooding" ~ "yes",
                                  dam_shelters_reason == "conflict_looting" ~ "yes",
                                  dam_shelters_reason == "fire" ~ "yes",
                                  TRUE ~ "no"))
