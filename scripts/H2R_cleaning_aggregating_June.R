@@ -1,6 +1,7 @@
 library(tidyverse)
+
+# remotes::install_github("elliottmess/butter")
 library(butteR)
-library(koboloadeR)
 library(survey)
 library(lubridate)
 library(sf)
@@ -55,7 +56,7 @@ df <- df %>%
   mutate(health_workers_available = case_when((how_often_provide_health =="once_a_week") ~ "yes",
                                               how_often_provide_health == "2_3_times_month" ~ "yes",
                                               how_often_provide_health == "once_a_month" ~ "yes",
-                                              how_often_provide_health == "less_frequently" ~ "yes",
+                                              # how_often_provide_health == "less_frequently" ~ "yes",
                                               TRUE ~ "no")) %>% 
   mutate(dam_shelter = case_when((dam_shelters_reason == "flooding") ~ "yes",
                                         dam_shelters_reason == "conflict_looting" ~ "yes",
@@ -202,7 +203,7 @@ settlement_data$idp_proportion_settlem[settlement_data$visit_lastmonth != "yes"]
 
 settlement_data$idp_proportion_settlem[settlement_data$visit_lastmonth != "yes"] <- "SL"
 
-settlement_data$idp_new_arrivals[settlement_data$idp_proportion_settlem == "no_idps" |settlement_data$idp_proportion_settlem == "dontknow" ] <- "SL"
+settlement_data$idp_new_arrivals[settlement_data$idp_proportion_settlem == "no_idps" |settlement_data$idp_proportion_settlem == "dontknow" | settlement_data$idp_proportion_settlem == "SL"] <- "SL"
 
 #idp_new_arrivals
 
@@ -254,14 +255,31 @@ settlement_data$hc_push_second[settlement_data$visit_lastmonth != "yes"] <- "SL"
     #access to market long tool
 
 settlement_data$nomarket_why.market_far[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.market_far[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$nomarket_why.road_closed[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.road_closed[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$nomarket_why.concern_transmiting[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.concern_transmiting[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$nomarket_why.other[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.other[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$nomarket_why.no_items[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.other[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$nomarket_why.dontknow[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.other[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$nomarket_why.security[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.other[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$nomarket_why.bad_quality[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.other[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$nomarket_why.no_cash[settlement_data$access_market != "no_access"] <- "SL"
+settlement_data$nomarket_why.other[settlement_data$access_market == "NC"] <- "NC"
 
 #access to market short tool
 # 
@@ -280,27 +298,53 @@ settlement_data$nomarket_why.no_cash[settlement_data$access_market != "no_access
 
 #market location
 settlement_data$market_region[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_region[settlement_data$access_market == "NC"] <- "NC"
 
 settlement_data$market_district[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_district[settlement_data$access_market == "NC"] <- "NC"
+
 
 settlement_data$market_settlement[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-
+settlement_data$market_settlement[settlement_data$access_market == "NC"] <- "NC"
 
 settlement_data$distance_to_market[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
-
+settlement_data$distance_to_market[settlement_data$access_market == "NC"] <- "NC"
 
 settlement_data$market_goods.clothes_sewing[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes" ] <- "SL"
+settlement_data$market_goods.clothes_sewing[settlement_data$access_market == "NC"] <- "NC"
+                                            
 settlement_data$market_goods.tools_seeds[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.tools_seeds[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$market_goods.livestock[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.livestock[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$market_goods.food[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.food[settlement_data$access_market == "NC"] <- "NC"
+                                  
 settlement_data$market_goods.jerry_cans[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.jerry_cans[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$market_goods.construction_materials[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.construction_materials[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$market_goods.mosquito_nets[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.mosquito_nets[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$market_goods.womens_materials[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.womens_materials[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$market_goods.fuel_cooking[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.fuel_cooking[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$market_goods.dontknow[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes" ] <- "SL"
+settlement_data$market_goods.dontknow[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$market_goods.soap[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.soap[settlement_data$access_market == "NC"] <- "NC"
+
 settlement_data$market_goods.shoes[settlement_data$access_market != "yes_always" & settlement_data$access_market != "yes_restricted" |  settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$market_goods.shoes[settlement_data$access_market  == "NC"] <- "NC"
 
 
 #lackfoods
@@ -358,20 +402,42 @@ settlement_data$health_issues[settlement_data$visit_lastmonth != "yes"] <- "SL"
 # access_health_services
 
 settlement_data$available_health_services.none[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.none[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.mobile_clinic[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.mobile_clinic[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.hospital[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.hospital[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.first_aid[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.first_aid[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.clinic[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.clinic[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.other[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.other[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.midwife[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.midwife[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.dontknow[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.dontknow[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.healer[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.healer[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.individual_pract[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.individual_pract[settlement_data$access_healthservices == "NC"] <- "NC"
+
 settlement_data$available_health_services.drugstore[settlement_data$access_healthservices != "yes"] <- "SL"
+settlement_data$available_health_services.drugstore[settlement_data$access_healthservices == "NC"] <- "NC"
 
 #dist_clinic
 
 settlement_data$distance_clinic[settlement_data$available_health_services.clinic != "yes" & settlement_data$available_health_services.mobile_clinic != "yes" & settlement_data$available_health_services.hospital != "yes"] <- "SL"
+settlement_data$distance_clinic[settlement_data$available_health_services.clinic == "NC"] <- "NC"
 
 #no_access_health
 
@@ -435,43 +501,99 @@ settlement_data$freedommov_night[settlement_data$visit_lastmonth != "yes"] <- "S
 
   # protection_inc_location
 settlement_data$protection_inc_location.human_aid_distr[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.school[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.shelters[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.bathing_pl[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.checkpoint[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.dontknow[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.clinic[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.on_the_road[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.latrines[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.near_water[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.in_field[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.other[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
-settlement_data$protection_inc_location.market[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.human_aid_distr[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
 
-  #Conflict mediators
+
+settlement_data$protection_inc_location.school[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.school[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.shelters[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.shelters[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.bathing_pl[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.bathing_pl[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.checkpoint[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.checkpoint[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.dontknow[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.dontknow[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.clinic[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.clinic[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.on_the_road[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.on_the_road[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.latrines[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.latrines[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.near_water[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.near_water[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.in_field[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.in_field[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.other[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.other[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+settlement_data$protection_inc_location.market[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$protection_inc_location.market[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+ 
+
+ #Conflict mediators
 
 settlement_data$conflict_mediators.clan_lead[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.clan_lead[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 settlement_data$conflict_mediators.gatekeeper[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.gatekeeper[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 settlement_data$conflict_mediators.none[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.none[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 settlement_data$conflict_mediators.loc_authorities[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.loc_authorities[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 settlement_data$conflict_mediators.rel_leader[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.rel_leader[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 settlement_data$conflict_mediators.health_staff[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.health_staff[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
+
 settlement_data$conflict_mediators.ngo_staff[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.ngo_staff[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 settlement_data$conflict_mediators.other[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.other[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 settlement_data$conflict_mediators.commun_leader_elder[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.commun_leader_elder[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 settlement_data$conflict_mediators.dontknow[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.dontknow[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 settlement_data$conflict_mediators.noresponse[settlement_data$protection_incidents.dontknow == "yes" | settlement_data$protection_incidents.none == "yes" | settlement_data$protection_incidents.noresponse == "yes"] <- "SL"
+settlement_data$conflict_mediators.noresponse[settlement_data$protection_incidents.dontknow == "NC" | settlement_data$protection_incidents.none == "NC" | settlement_data$protection_incidents.noresponse == "NC" ] <- "NC"
+
 
 # Shelter and NFI
   # shelter type
 
 settlement_data$shelter_type[settlement_data$visit_lastmonth != "yes"] <-  "SL"
 
+
 settlement_data$shelters_not_rebuilt[settlement_data$dam_shelters_reason == "no_destroyed" | settlement_data$dam_shelters_reason == "dontknow" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$shelters_not_rebuilt[settlement_data$dam_shelters_reason == "NC" ] <- "NC"
+                                     
 settlement_data$shelt_not_rebuilt_why[settlement_data$dam_shelters_reason == "no_destroyed" | settlement_data$dam_shelters_reason == "dontknow" | settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$shelt_not_rebuilt_why[settlement_data$dam_shelters_reason == "NC"] <- "NC"
 
   # wash
 settlement_data$surfacewater_drinking[settlement_data$mainsource_water == "berkad" | settlement_data$mainsource_water == "river_pond"] <- "SL"
+settlement_data$surfacewater_drinking[settlement_data$mainsource_water == "NC"] <- "NC"
+
 settlement_data$gettingwater_time[ settlement_data$visit_lastmonth != "yes"] <- "SL"
 settlement_data$water_seasonal[ settlement_data$visit_lastmonth != "yes"] <- "SL"
 
@@ -502,6 +624,7 @@ settlement_data$waste_disposal[ settlement_data$visit_lastmonth != "yes"] <- "SL
 # Education
 
 settlement_data$time_to_school[settlement_data$education_available.none == "yes" | settlement_data$education_available.dontknow == "yes"| settlement_data$visit_lastmonth != "yes"] <- "SL"
+settlement_data$time_to_school[settlement_data$education_available.none == "NC" | settlement_data$education_available.dontknow == "NC"] <- "SL"
 
 
 # Communication
@@ -663,6 +786,27 @@ setlement_level$covid_measures.keeping_people <- forcats::fct_expand(setlement_l
 
 
 
+
+setlement_level$how_often_provide_health <- as.factor(setlement_level$how_often_provide_health) #Elliott: Converting to factor so can be passed to butteR::mean_proportion_table
+setlement_level$barriers_health.other <- forcats::fct_expand(setlement_level$barriers_health.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$barriers_health.dontknow <- forcats::fct_expand(setlement_level$barriers_health.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$protection_incidents.other <- forcats::fct_expand(setlement_level$protection_incidents.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$incidents_wh_leaving.other <- forcats::fct_expand(setlement_level$incidents_wh_leaving.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$education_available.other <- forcats::fct_expand(setlement_level$education_available.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$education_available.dontknow <- forcats::fct_expand(setlement_level$education_available.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$info_mainsource.other <- forcats::fct_expand(setlement_level$info_mainsource.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$info_mainsource.dontknow <- forcats::fct_expand(setlement_level$info_mainsource.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$info_mainsource.noresponse <- forcats::fct_expand(setlement_level$info_mainsource.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$info_barriers.other <- forcats::fct_expand(setlement_level$info_barriers.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$ngo_support_type.other <- forcats::fct_expand(setlement_level$ngo_support_type.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+
+setlement_level$health_workers_available <- forcats::fct_expand(setlement_level$health_workers_available,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$education_available_none <- forcats::fct_expand(setlement_level$education_available_none,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+
+
+
+
+
 dfsvy_h2r_district <-srvyr::as_survey(setlement_level)
 
 
@@ -789,9 +933,7 @@ write.csv(setlement_level,"outputs/june_may settlement_aggregation.csv" )
 #Export FS columns
 
 grid_level_fs <- grid_level %>% 
-  select(c( "hex_4000km" ,"ki_num","assessed_num", "food_price_changed_prices_increased",
-            "education_available_none_yes", 
-            
+  select(c( "hex_4000km" ,"ki_num","assessed_num", "food_price_changed_prices_increased", 
             "access_healthservices_no", "health_workers_available_yes", "protection_incidents_none_no", "dam_shelter_yes", 
             "handwashing_access_no", "covid_information_no"))
 write.csv(grid_level_fs, "outputs/fs_june_Aggreg_by_hex_400km.csv")

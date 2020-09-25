@@ -160,7 +160,7 @@ equal <- c("consent", "base","ppl_no_land_tenure", "depart_return_safe", "freedo
             "distance_clinic",
            "region_clinic", "district_clinic", "settlement_clinic",
            "idp_host_relationships",
-           "ppl_no_land_tenure",
+           "ppl_no_land_tenure","access_healthservices",
            "land_tenure_form", "depart_return_safe", "freedommov_day", "freedommov_night",
            "shelter_type", "dam_shelters_reason", 
            "shelters_not_rebuilt", "shelt_not_rebuilt_why", 
@@ -168,7 +168,7 @@ equal <- c("consent", "base","ppl_no_land_tenure", "depart_return_safe", "freedo
            "waste_disposal", "time_to_school", "education_bar_girls", "education_bar_boys",
            "info_personsource", "road_connection_y_n", "food_price_changed", "nfi_price_changed", "soap_price_changed",
           "how_often_provide_health", "idp_new_arrivals","skip_meals",
-          "access_healthservices","unaccompanied_child_y_n", "cases_eviction", "ppl_no_shelter", "surfacewater_drinking",
+          "unaccompanied_child_y_n", "cases_eviction", "ppl_no_shelter", "surfacewater_drinking",
           "water_sufficient_lastmonth","water_seasonal", "stagnant_water_near", "info_ngo_y_n", "ngo_support_y_n", "plane_connection_y_n",
           "particip_again", "handwashing_access",  "covid_information", "health_workers_available", "dam_shelter"
             )
