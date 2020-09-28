@@ -53,10 +53,11 @@ df <- df %>%
   # This will be used to analyse the Health workers access 
 
 df <- df %>% 
+ 
   mutate(health_workers_available = case_when((how_often_provide_health =="once_a_week") ~ "yes",
                                               how_often_provide_health == "2_3_times_month" ~ "yes",
                                               how_often_provide_health == "once_a_month" ~ "yes",
-                                              # how_often_provide_health == "less_frequently" ~ "yes",
+                                              how_often_provide_health == "less_frequently" ~ "yes",
                                               TRUE ~ "no")) %>% 
   mutate(dam_shelter = case_when((dam_shelters_reason == "flooding") ~ "yes",
                                         dam_shelters_reason == "conflict_looting" ~ "yes",
@@ -933,9 +934,8 @@ write.csv(setlement_level,"outputs/june_may settlement_aggregation.csv" )
 #Export FS columns
 
 grid_level_fs <- grid_level %>% 
-  select(c( "hex_4000km" ,"ki_num","assessed_num", "food_price_changed_prices_increased", 
+  select(c( "hex_4000km" ,"ki_num","assessed_num", "food_price_changed_prices_increased", "education_bar_cost_stud",
             "access_healthservices_no", "health_workers_available_yes", "protection_incidents_none_no", "dam_shelter_yes", 
-            "handwashing_access_no", "covid_information_no"))
 write.csv(grid_level_fs, "outputs/fs_june_Aggreg_by_hex_400km.csv")
 
 
