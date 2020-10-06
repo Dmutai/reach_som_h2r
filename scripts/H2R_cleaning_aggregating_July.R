@@ -23,12 +23,12 @@ admin_gdb<- "inputs/gis_data/boundaries"
 
 #Additional scripts to use incase there are several files to be merged
 # merge Mogadishu and Baidoa clean data
-# merge_kobo_data("inputs/2020_06/",".csv", output_file = "inputs/2020_06/h2r_june_may_consolidated_mog_baidoa_clean.csv")
+# merge_kobo_data("inputs/2020_07/",".csv", output_file = "inputs/2020_07/h2r_july_may_consolidated_mog_baidoa_clean.csv")
 
 
 
 #Clean data
-df<-read.csv("inputs/2020_06/h2r_june_may_consolidated_mog_baidoa_clean.csv", stringsAsFactors = FALSE)
+df<-read.csv("inputs/2020_07/h2r_july_consolidated_mog_baidoa_clean.csv", stringsAsFactors = FALSE)
 #latest settlement data used
 
 # merging the columns collected using the short tool to the main tool
@@ -139,7 +139,7 @@ df <- left_join(df,item_geo, by = "finalsettlment")
 #Ki- settlement level aggregation----------
 #Columns select beased function applied
 
-source("scripts/h2r_june_columns_for_aggregation.R")
+source("scripts/h2r_July_columns_for_aggregation.R")
 
 ki_coverage <- df %>%
   select(calc.region,calc.district,finalsettlment, particip_again) %>%
@@ -703,7 +703,7 @@ settlement_data <- settlement_data %>%
 
 write.csv(
   settlement_data,
-  file = "outputs/som_H2r__clean_data_20200601.csv",
+  file = "outputs/som_H2r__clean_data_20200701.csv",
   na = "",
   row.names = FALSE)
 
@@ -712,7 +712,7 @@ write.csv(
 #Join our data to settlement shapefile
 
 settlement_data$P_CODE <- settlement_data$finalsettlment
-settlement_data$month <- "20200601"
+settlement_data$month <- "20200701"
 som_settlements_data <- inner_join(som_settlements,settlement_data )
 
 
@@ -730,6 +730,7 @@ som_settlements_data <- som_settlements_data %>%
 setlement_level <- som_settlements_data %>%  select(name:dam_shelter) %>% filter(!is.na(D.ki_coverage))
 
 #Reformatting the datato run in srvyr package for the as_survey function
+
 
 
 # setlement_level$visit_lastmonth <- forcats::fct_expand(setlement_level$visit_lastmonth,c("yes","no"))
@@ -790,6 +791,8 @@ setlement_level$covid_measures.old_people_move <- forcats::fct_expand(setlement_
 setlement_level$covid_measures.using_sanitizers <- forcats::fct_expand(setlement_level$covid_measures.using_sanitizers,c("yes","no"))
 setlement_level$covid_measures.isolate_people_with_syspthoms <- forcats::fct_expand(setlement_level$covid_measures.isolate_people_with_syspthoms,c("yes","no"))
 setlement_level$covid_measures.keeping_people <- forcats::fct_expand(setlement_level$covid_measures.keeping_people,c("yes","no"))
+setlement_level$covid_measures.no_measure_taken <- forcats::fct_expand(setlement_level$covid_measures.no_measure_taken,c("yes","no"))
+setlement_level$covid_measures.wearing_masks <- forcats::fct_expand(setlement_level$covid_measures.wearing_masks,c("yes","no"))
 
 
 
@@ -801,6 +804,9 @@ setlement_level$protection_incidents.other <- forcats::fct_expand(setlement_leve
 setlement_level$incidents_wh_leaving.other <- forcats::fct_expand(setlement_level$incidents_wh_leaving.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
 setlement_level$education_available.other <- forcats::fct_expand(setlement_level$education_available.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
 setlement_level$education_available.dontknow <- forcats::fct_expand(setlement_level$education_available.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+setlement_level$education_available.secon_girls <- forcats::fct_expand(setlement_level$education_available.secon_boys,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+
+
 setlement_level$info_mainsource.other <- forcats::fct_expand(setlement_level$info_mainsource.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
 setlement_level$info_mainsource.dontknow <- forcats::fct_expand(setlement_level$info_mainsource.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
 setlement_level$info_mainsource.noresponse <- forcats::fct_expand(setlement_level$info_mainsource.dontknow,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
@@ -808,8 +814,23 @@ setlement_level$info_barriers.other <- forcats::fct_expand(setlement_level$info_
 setlement_level$ngo_support_type.other <- forcats::fct_expand(setlement_level$ngo_support_type.other,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
 
 setlement_level$health_workers_available <- forcats::fct_expand(setlement_level$health_workers_available,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
-setlement_level$education_available_none <- forcats::fct_expand(setlement_level$education_available_none,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
+# setlement_level$education_available_none <- forcats::fct_expand(setlement_level$education_available_none,c("yes","no")) #Elliott: adding levels so can be passed to butteR::mean_proportion_table
 
+
+setlement_level$nomarket_why.no_items <- forcats::fct_expand(setlement_level$nomarket_why.no_items, c("yes", "no"))
+setlement_level$nomarket_why.security <- forcats::fct_expand(setlement_level$nomarket_why.security, c("yes", "no"))
+setlement_level$nomarket_why.bad_quality <- forcats::fct_expand(setlement_level$nomarket_why.bad_quality, c("yes", "no"))
+setlement_level$nomarket_why.no_cash <- forcats::fct_expand(setlement_level$nomarket_why.no_cash, c("yes", "no"))
+
+
+
+setlement_level$land_tenure_form <- forcats::fct_expand(setlement_level$land_tenure_form, c("yes", "no"))
+
+setlement_level$protection_incidents.sexual_violence <- forcats::fct_expand(setlement_level$protection_incidents.sexual_violence, c("yes", "no"))
+setlement_level$protection_incidents.uxo <- forcats::fct_expand(setlement_level$protection_incidents.uxo, c("yes", "no"))
+
+setlement_level$incidents_wh_leaving.killing <- forcats::fct_expand(setlement_level$incidents_wh_leaving.killing, c("yes", "no"))
+setlement_level$incidents_wh_leaving.sexual_violence <- forcats::fct_expand(setlement_level$incidents_wh_leaving.sexual_violence, c("yes", "no"))
 
 
 
@@ -932,10 +953,10 @@ list_of_datasets <- list("settlement_aggregation" = setlement_level, "Aggregatio
 #write.xlsx(list_of_datasets, file = "outputs/som_h2r_summary_20200101.xlsx")
 
 
-write.csv(grid_level,"outputs/june_may Aggregation by hex 400km.csv" )
-write.csv(district_level,"outputs/june_may Aggregation by district.csv" )
-write.csv(district_level,"outputs/june_may Aggregation by district.csv" )
-write.csv(setlement_level,"outputs/june_may settlement_aggregation.csv" )
+write.csv(grid_level,"outputs/july Aggregation by hex 400km.csv" )
+write.csv(district_level,"outputs/july Aggregation by district.csv" )
+write.csv(district_level,"outputs/july Aggregation by district.csv" )
+write.csv(setlement_level,"outputs/july settlement_aggregation.csv" )
 
 #Export FS columns
 
@@ -943,6 +964,6 @@ grid_level_fs <- grid_level %>%
   select(c( "hex_4000km" ,"ki_num","assessed_num", "food_price_changed_prices_increased", "education_bar_cost_stud",
             "access_healthservices_no", "health_workers_available_yes", "protection_incidents_none_no", "dam_shelter_yes", 
             "handwashing_access_no", "sources_covid_informaiton_mobile_network_operator_yes"))
-write.csv(grid_level_fs, "outputs/fs_june_Aggreg_by_hex_400km.csv")
+write.csv(grid_level_fs, "outputs/fs_july_Aggreg_by_hex_400km.csv")
 
 
